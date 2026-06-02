@@ -9,6 +9,13 @@ import CartCard from "./cards/CartCard";
 import SuggestedPrompts from "./SuggestedPrompts";
 
 marked.setOptions({ breaks: true });
+const renderer = new marked.Renderer();
+const origLink = renderer.link.bind(renderer);
+renderer.link = function (href, title, text) {
+  const html = origLink(href, title, text);
+  return html.replace("<a ", '<a target="_blank" rel="noreferrer" ');
+};
+marked.use({ renderer });
 
 function renderCard(card, i, ctx) {
   switch (card.type) {

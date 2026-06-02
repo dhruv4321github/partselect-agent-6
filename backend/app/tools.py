@@ -8,11 +8,60 @@ Each tool has:
 UI payloads streamed to the frontend (the model never has to serialize them).
 `suggestions` are optional follow-up chips.
 """
-from typing import Callable, Dict
+from typing import Callable, Dict, List
 
 from .catalog import PartsRepository
 
 repo = PartsRepository()
+
+
+class Cart:
+    """Simple in-memory cart. Clears on server restart."""
+
+    def __init__(self):
+        self._items: Dict[str, dict] = {}  # ps_number -> {part, quantity}
+
+    def add(self, part: dict, quantity: int = 1) -> dict:
+        ps = part["ps_number"]
+        if ps in self._items:
+            self._items[ps]["quantity"] += quantity
+        else:
+            self._items[ps] = {"part": part, "quantity": quantity}
+        return self._items[ps]
+
+    def remove(self, ps_number: str) -> bool:
+        return self._items.pop(ps_number.strip().upper(), None) is not None
+
+    def update_quantity(self, ps_number: str, quantity: int) -> bool:
+        key = ps_number.strip().upper()
+        if key not in self._items:
+            return False
+        if quantity <= 0:
+            self._items.pop(key)
+        else:
+            self._items[key]["quantity"] = quantity
+        return True
+
+    def clear(self):
+        self._items.clear()
+
+    @property
+    def items(self) -> List[dict]:
+        return list(self._items.values())
+
+    @property
+    def total(self) -> float:
+        return sum(
+            (item["part"].get("price") or 0) * item["quantity"]
+            for item in self._items.values()
+        )
+
+    @property
+    def count(self) -> int:
+        return sum(item["quantity"] for item in self._items.values())
+
+
+cart = Cart()
 
 
 # --------------------------------------------------------------------------
@@ -126,7 +175,7 @@ TOOL_SCHEMAS = [
     },
     {
         "name": "add_to_cart",
-        "description": "Add a part to the cart so the customer can purchase it. Returns a cart action for the UI.",
+        "description": "Add a part to the customer's cart. Returns the updated cart state.",
         "input_schema": {
             "type": "object",
             "properties": {
@@ -134,6 +183,24 @@ TOOL_SCHEMAS = [
                 "quantity": {"type": "integer", "minimum": 1, "default": 1},
             },
             "required": ["part_number"],
+        },
+    },
+    {
+        "name": "view_cart",
+        "description": "Show the current contents of the customer's cart with all items and totals.",
+        "input_schema": {
+            "type": "object",
+            "properties": {},
+        },
+    },
+    {
+        "name": "remove_from_cart",
+        "description": "Remove a part from the cart by its PartSelect number, or clear the entire cart.",
+        "input_schema": {
+            "type": "object",
+            "properties": {
+                "part_number": {"type": "string", "description": "PS number to remove. Omit to clear entire cart."},
+            },
         },
     },
     {
@@ -152,6 +219,23 @@ TOOL_SCHEMAS = [
                 },
             },
             "required": ["symptom_url"],
+        },
+    },
+    {
+        "name": "diagnose_model_symptom",
+        "description": (
+            "Get model-specific diagnosis: which parts fix a symptom on a specific "
+            "appliance model, with fix-percentage data. Requires both a model number "
+            "and a symptom name. Use after the customer provides their model number "
+            "during a repair/troubleshooting conversation."
+        ),
+        "input_schema": {
+            "type": "object",
+            "properties": {
+                "model_number": {"type": "string"},
+                "symptom": {"type": "string", "description": "The symptom to diagnose (e.g. 'Fridge too warm')."},
+            },
+            "required": ["model_number", "symptom"],
         },
     },
 ]
@@ -348,8 +432,8 @@ def tool_get_repair_help(appliance_type, symptom, brand=None):
         for ps in cause.get("recommended_parts", []):
             lines.append(f"  Recommended part: {ps}")
     lines.append(
-        "\nExplain the causes to the customer and suggest they provide their "
-        "model number so we can find the exact compatible parts."
+        "\nExplain the causes to the customer clearly and suggest "
+        "which parts they may need to check or replace."
     )
     return {"summary": "\n".join(lines), "cards": [], "suggestions": []}
 
@@ -395,6 +479,28 @@ def tool_lookup_order(order_id, email=None):
     return {"summary": summary, "cards": [card], "suggestions": []}
 
 
+def _cart_card() -> dict:
+    """Build a cart card reflecting the full current cart state."""
+    items = []
+    for entry in cart.items:
+        p = entry["part"]
+        items.append({
+            "ps_number": p["ps_number"],
+            "name": p["name"],
+            "price": p.get("price") or 0,
+            "quantity": entry["quantity"],
+            "line_total": round((p.get("price") or 0) * entry["quantity"], 2),
+            "image_url": p.get("image_url", ""),
+            "url": p.get("url", ""),
+        })
+    return {
+        "type": "cart",
+        "items": items,
+        "item_count": cart.count,
+        "total": round(cart.total, 2),
+    }
+
+
 def tool_add_to_cart(part_number, quantity=1):
     part = repo.get_part(part_number)
     if not part:
@@ -403,19 +509,40 @@ def tool_add_to_cart(part_number, quantity=1):
         return {"summary": f"{part['name']} (#{part['ps_number']}) is currently out of stock, "
                            f"so it can't be added to the cart.", "cards": []}
     quantity = max(1, int(quantity or 1))
-    line_total = part["price"] * quantity
-    card = {
-        "type": "cart",
-        "action": "added",
-        "quantity": quantity,
-        "line_total": round(line_total, 2),
-        "cart_url": "https://www.partselect.com/cart/",
-        "part": repo.to_product_card(part),
-    }
+    cart.add(part, quantity)
     summary = (f"Added {quantity} x {part['name']} (#{part['ps_number']}) to the cart. "
-               f"Line total ${line_total:.2f}.")
-    return {"summary": summary, "cards": [card],
-            "suggestions": [f"How do I install {part['ps_number']}?", "Find another part"]}
+               f"Cart now has {cart.count} item(s), total ${cart.total:.2f}.")
+    return {"summary": summary, "cards": [_cart_card()],
+            "suggestions": [f"How do I install {part['ps_number']}?", "View my cart"]}
+
+
+def tool_view_cart():
+    if not cart.items:
+        return {"summary": "The cart is empty.", "cards": [], "suggestions": ["Search for a part"]}
+    lines = ["Current cart:"]
+    for entry in cart.items:
+        p = entry["part"]
+        lines.append(f"- {entry['quantity']} x {p['name']} (#{p['ps_number']}), "
+                     f"${(p.get('price') or 0) * entry['quantity']:.2f}")
+    lines.append(f"\nTotal: ${cart.total:.2f} ({cart.count} item(s))")
+    return {"summary": "\n".join(lines), "cards": [_cart_card()], "suggestions": []}
+
+
+def tool_remove_from_cart(part_number=None):
+    if not part_number:
+        cart.clear()
+        return {"summary": "Cart has been cleared.", "cards": [], "suggestions": ["Search for a part"]}
+    key = part_number.strip().upper()
+    if cart.remove(key):
+        summary = f"Removed {key} from the cart."
+        if cart.items:
+            summary += f" Cart now has {cart.count} item(s), total ${cart.total:.2f}."
+        else:
+            summary += " Cart is now empty."
+        return {"summary": summary, "cards": [_cart_card()] if cart.items else [],
+                "suggestions": []}
+    return {"summary": f"{part_number} was not in the cart.", "cards": [],
+            "suggestions": ["View my cart"]}
 
 
 def tool_get_symptom_repair_guide(symptom_url):
@@ -432,10 +559,77 @@ def tool_get_symptom_repair_guide(symptom_url):
     if detail.get("url"):
         lines.append(f"\nFull guide: {detail['url']}")
     lines.append(
-        "\nExplain these causes to the customer clearly. Suggest they "
-        "provide their model number so we can find the exact compatible parts."
+        "\nIMPORTANT: Present ONLY the causes listed above. Do NOT add "
+        "causes, tips, or suggestions that are not in this data. "
+        "After explaining the causes, ask the customer for their model "
+        "number so you can use diagnose_model_symptom to find the exact "
+        "parts that fix this issue on their specific appliance."
     )
-    return {"summary": "\n".join(lines), "cards": [], "suggestions": []}
+    return {"summary": "\n".join(lines), "cards": [],
+            "suggestions": ["I have my model number"]}
+
+
+def tool_diagnose_model_symptom(model_number, symptom):
+    model_symptoms = repo.fetch_model_symptoms(model_number)
+    if not model_symptoms:
+        return {
+            "summary": f"Could not find symptoms for model {model_number}. "
+                       f"The model may not be in PartSelect's database.",
+            "cards": [],
+        }
+    symptom_l = symptom.lower()
+    best, best_score = None, 0
+    for s in model_symptoms:
+        title_l = s["title"].lower()
+        score = 0
+        if title_l == symptom_l:
+            score = 10
+        elif title_l in symptom_l or symptom_l in title_l:
+            score = 5
+        else:
+            user_tokens = {t for t in symptom_l.split() if len(t) > 2}
+            title_tokens = {t for t in title_l.split() if len(t) > 2}
+            score = len(user_tokens & title_tokens) * 2
+        if score > best_score:
+            best, best_score = s, score
+    if not best or best_score < 2:
+        syms = ", ".join(s["title"] for s in model_symptoms[:10])
+        return {
+            "summary": f"Model {model_number} doesn't have a symptom matching "
+                       f"'{symptom}'. Available symptoms: {syms}.",
+            "cards": [],
+        }
+    parts_data = repo.fetch_model_symptom_parts(model_number, best["url"])
+    if not parts_data:
+        return {
+            "summary": f"No parts data found for '{best['title']}' on model {model_number}.",
+            "cards": [],
+        }
+    lines = [f"Model-specific diagnosis for {model_number}: {best['title']}",
+             f"\nParts that fix this (ranked by likelihood):"]
+    for p in parts_data:
+        stock = "in stock" if p["in_stock"] else "out of stock"
+        price_str = f"${p['price']:.2f}" if p["price"] else "price TBD"
+        lines.append(
+            f"\n- {p['name']} (#{p['ps_number']}), {price_str}, {stock}"
+            f" — fixes this {p['fix_pct']}% of the time"
+        )
+    lines.append(
+        "\nPresent these parts to the customer ranked by fix likelihood. "
+        "ONLY mention the parts and percentages listed above."
+    )
+    # Return product cards so the user gets add-to-cart / view-on-website buttons
+    cards = []
+    for p in parts_data:
+        part_obj = repo.get_part(p["ps_number"])
+        if part_obj:
+            cards.append(repo.to_product_card(part_obj))
+    suggestions = []
+    if parts_data:
+        top = parts_data[0]
+        suggestions = [f"Tell me about {top['ps_number']}",
+                       f"Add {top['ps_number']} to cart"]
+    return {"summary": "\n".join(lines), "cards": cards, "suggestions": suggestions}
 
 
 TOOL_IMPLEMENTATIONS: Dict[str, Callable] = {
@@ -447,7 +641,10 @@ TOOL_IMPLEMENTATIONS: Dict[str, Callable] = {
     "find_parts_for_model": tool_find_parts_for_model,
     "lookup_order": tool_lookup_order,
     "add_to_cart": tool_add_to_cart,
+    "view_cart": tool_view_cart,
+    "remove_from_cart": tool_remove_from_cart,
     "get_symptom_repair_guide": tool_get_symptom_repair_guide,
+    "diagnose_model_symptom": tool_diagnose_model_symptom,
 }
 
 

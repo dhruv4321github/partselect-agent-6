@@ -14,7 +14,7 @@
     "url": "https://www.partselect.com/PS11752778-Whirlpool-WPW10321304-Refrigerator-Door-Shelf-Bin.htm",
     "description": "Manufacturer-certified refrigerator door shelf bin (also called a door bin). Clear plastic with white trim, used to hold jars, bottles, cans, and condiments in the fridge door. Tool-free, snap-in installation.",
     "symptoms_fixed": ["Door won't open or close", "Ice maker won't dispense ice", "Leaking"],
-    "compatible_brands": ["Whirlpool", "Kenmore", "Maytag", "KitchenAid", "Amana"],
+    "compatible_products": ["Whirlpool", "Kenmore", "Maytag", "KitchenAid", "Amana"],
     "compatible_models": ["ED5FVGXWS07", "WRS325SDHZ08", "WRS325FDAM04", "GS6NBEXRS01"],
     "replaces_parts": ["AP6019471", "2171046", "2171047", "2179574", "2179575", "2198449", "W10321302", "W10321303", "W10549739"],
     "install": {
@@ -48,7 +48,7 @@
     "url": "https://www.partselect.com/PS11757030-Whirlpool-WPW10295370A-Refrigerator-Water-Filter.htm",
     "description": "Genuine refrigerator water filter that reduces contaminants, chlorine taste, and odor. Should be replaced about every 6 months for clean water and ice.",
     "symptoms_fixed": ["Bad-tasting water or ice", "Ice maker not making ice", "Slow water dispenser", "Cloudy ice"],
-    "compatible_brands": ["Whirlpool", "Maytag", "KitchenAid", "Amana", "JennAir"],
+    "compatible_products": ["Whirlpool", "Maytag", "KitchenAid", "Amana", "JennAir"],
     "compatible_models": ["WRS325SDHZ08", "WRX735SDHZ00", "ED5FVGXWS07", "WRF555SDFZ"],
     "replaces_parts": ["AP6577949", "W10295370", "W10276924", "EDR1RXD1"],
     "install": {
@@ -82,7 +82,7 @@
     "url": "https://www.partselect.com/PS11722148-Whirlpool-W10882923-Ice-Maker-Assembly.htm",
     "description": "Complete modular ice maker assembly. Replace when the ice maker stops producing ice, makes hollow or undersized cubes, or fails to eject ice even though water reaches the unit.",
     "symptoms_fixed": ["Ice maker not making ice", "Ice maker won't dispense ice", "Hollow or small ice cubes"],
-    "compatible_brands": ["Whirlpool", "Kenmore", "Maytag", "KitchenAid", "Amana"],
+    "compatible_products": ["Whirlpool", "Kenmore", "Maytag", "KitchenAid", "Amana"],
     "compatible_models": ["WRS325SDHZ08", "WRS325FDAM04", "ED5FVGXWS07", "GS6NBEXRS01"],
     "replaces_parts": ["AP5986694", "W10122502", "W10190960", "W10300022"],
     "install": {
@@ -117,7 +117,7 @@
     "url": "https://www.partselect.com/PS11739136-Whirlpool-W10408179-Water-Inlet-Valve.htm",
     "description": "Dual water inlet valve that controls water flow to the ice maker and water dispenser. A failed valve is a common cause of an ice maker that gets power but produces no ice.",
     "symptoms_fixed": ["Ice maker not making ice", "No water from dispenser", "Leaking"],
-    "compatible_brands": ["Whirlpool", "Kenmore", "Maytag", "KitchenAid"],
+    "compatible_products": ["Whirlpool", "Kenmore", "Maytag", "KitchenAid"],
     "compatible_models": ["WRS325SDHZ08", "WRS325FDAM04", "ED5FVGXWS07"],
     "replaces_parts": ["AP6020838", "W10238100", "W10312695", "W10394076"],
     "install": {
@@ -151,7 +151,7 @@
     "url": "https://www.partselect.com/PS11743427-Whirlpool-W10503278-Defrost-Thermostat.htm",
     "description": "Defrost thermostat that monitors evaporator temperature and allows the defrost heater to run. A failed thermostat causes frost buildup and warm fridge temperatures.",
     "symptoms_fixed": ["Refrigerator not cooling", "Frost buildup", "Freezer cold but fridge warm"],
-    "compatible_brands": ["Whirlpool", "Kenmore", "Maytag"],
+    "compatible_products": ["Whirlpool", "Kenmore", "Maytag"],
     "compatible_models": ["WRS325SDHZ08", "ED5FVGXWS07", "GS6NBEXRS01"],
     "replaces_parts": ["AP6022409", "W10225581", "2321799"],
     "install": {
@@ -185,7 +185,7 @@
     "url": "https://www.partselect.com/PS12364199-Whirlpool-WPW10565354-Crisper-Drawer.htm",
     "description": "Clear humidity-controlled crisper drawer for storing fruits and vegetables. Slides on the lower refrigerator rails.",
     "symptoms_fixed": ["Cracked or broken drawer", "Drawer won't slide"],
-    "compatible_brands": ["Whirlpool", "Maytag", "KitchenAid"],
+    "compatible_products": ["Whirlpool", "Maytag", "KitchenAid"],
     "compatible_models": ["WRS325SDHZ08", "WRX735SDHZ00"],
     "replaces_parts": ["AP6023163", "W10465943"],
     "install": {
@@ -217,7 +217,7 @@
     "url": "https://www.partselect.com/PS11703459-Whirlpool-W10619951-Refrigerator-Door-Gasket.htm",
     "description": "Magnetic door gasket that seals the refrigerator door. A torn or hardened gasket lets cold air escape, causing the compressor to run constantly and sweat to form.",
     "symptoms_fixed": ["Refrigerator not cooling", "Door won't seal", "Sweating or condensation"],
-    "compatible_brands": ["Whirlpool", "Kenmore", "Maytag"],
+    "compatible_products": ["Whirlpool", "Kenmore", "Maytag"],
     "compatible_models": ["WRS325SDHZ08", "ED5FVGXWS07"],
     "replaces_parts": ["AP6023123", "W10309076"],
     "install": {
@@ -250,7 +250,7 @@
     "url": "https://www.partselect.com/PS11756692-Whirlpool-WPW10503279-Temperature-Control-Board.htm",
     "description": "Main electronic control board that manages cooling, defrost cycles, and the ice maker. Suspect the board when multiple systems behave erratically.",
     "symptoms_fixed": ["Refrigerator not cooling", "Ice maker not making ice", "Erratic temperatures"],
-    "compatible_brands": ["Whirlpool", "Maytag", "KitchenAid"],
+    "compatible_products": ["Whirlpool", "Maytag", "KitchenAid"],
     "compatible_models": ["WRS325SDHZ08", "WRX735SDHZ00"],
     "replaces_parts": ["AP6022400", "W10219463", "W10310240"],
     "install": {
@@ -284,7 +284,7 @@
     "url": "https://www.partselect.com/PS11770283-Whirlpool-WPW10348269-Dishwasher-Drain-Pump.htm",
     "description": "Drain pump that removes water from the dishwasher tub at the end of a cycle. Replace when the dishwasher won't drain, leaves standing water, or hums without pumping.",
     "symptoms_fixed": ["Will not drain", "Standing water in tub", "Noisy during drain"],
-    "compatible_brands": ["Whirlpool", "Kenmore", "Maytag", "KitchenAid", "JennAir"],
+    "compatible_products": ["Whirlpool", "Kenmore", "Maytag", "KitchenAid", "JennAir"],
     "compatible_models": ["WDT780SAEM1", "WDF520PADM", "WDT750SAHZ0"],
     "replaces_parts": ["AP6020066", "W10348269", "W10084573", "8558995"],
     "install": {
@@ -319,7 +319,7 @@
     "url": "https://www.partselect.com/PS11763136-Whirlpool-W11177741-Dishwasher-Door-Seal.htm",
     "description": "Door seal/gasket (about 71 inches, stretches to ~75) that keeps water inside the tub. Replace when water leaks from the door during a wash cycle.",
     "symptoms_fixed": ["Leaking", "Water on the floor", "Door won't seal"],
-    "compatible_brands": ["Whirlpool", "Kenmore", "Maytag", "JennAir", "KitchenAid", "IKEA"],
+    "compatible_products": ["Whirlpool", "Kenmore", "Maytag", "JennAir", "KitchenAid", "IKEA"],
     "compatible_models": ["WDT780SAEM1", "WDT750SAHZ0", "WDF520PADM"],
     "replaces_parts": ["AP6035365", "W10300924", "W10542314"],
     "install": {
@@ -353,7 +353,7 @@
     "url": "https://www.partselect.com/PS11750673-Whirlpool-W10195416-Lower-Dishrack-Wheel.htm",
     "description": "Gray lower dishrack wheel assembly that lets the bottom rack roll in and out. Four are typically used per dishwasher. Replace cracked or missing wheels that make the rack drag.",
     "symptoms_fixed": ["Rack won't slide", "Rack derails", "Difficult to push in rack"],
-    "compatible_brands": ["Whirlpool", "Kenmore", "Maytag", "KitchenAid", "JennAir"],
+    "compatible_products": ["Whirlpool", "Kenmore", "Maytag", "KitchenAid", "JennAir"],
     "compatible_models": ["WDT780SAEM1", "WDT750SAHZ0", "WDF520PADM"],
     "replaces_parts": ["AP4538395", "W10195416V", "AH2358631"],
     "install": {
@@ -386,7 +386,7 @@
     "url": "https://www.partselect.com/PS11722128-Whirlpool-W10712395-Upper-Rack-Adjuster-Kit.htm",
     "description": "Upper rack adjuster kit with white wheels. Includes left and right adjusters and all components to service the upper rack. Newer kits upgrade the part from plastic to metal.",
     "symptoms_fixed": ["Upper rack falls or sags", "Top dishes not getting clean", "Rack won't adjust height"],
-    "compatible_brands": ["Whirlpool", "Kenmore", "Maytag", "KitchenAid", "JennAir"],
+    "compatible_products": ["Whirlpool", "Kenmore", "Maytag", "KitchenAid", "JennAir"],
     "compatible_models": ["WDT780SAEM1", "WDT750SAHZ0"],
     "replaces_parts": ["AP5957560", "W10250159", "W10350375"],
     "install": {
@@ -419,7 +419,7 @@
     "url": "https://www.partselect.com/PS11746180-Whirlpool-WPW10327455-Dishwasher-Spray-Arm.htm",
     "description": "Lower spray arm that sprays water over the bottom rack. Clogged or cracked spray arms are a leading cause of dishes coming out dirty.",
     "symptoms_fixed": ["Dishes not getting clean", "Low wash pressure", "Cracked spray arm"],
-    "compatible_brands": ["Whirlpool", "Kenmore", "Maytag", "KitchenAid"],
+    "compatible_products": ["Whirlpool", "Kenmore", "Maytag", "KitchenAid"],
     "compatible_models": ["WDT780SAEM1", "WDT750SAHZ0", "WDF520PADM"],
     "replaces_parts": ["AP6020203", "W10327455", "W10350375"],
     "install": {
@@ -452,7 +452,7 @@
     "url": "https://www.partselect.com/PS11725861-Whirlpool-WPW10463906-Dishwasher-Filter.htm",
     "description": "Fine filter / screen that traps food particles so they are not redeposited on dishes. A clogged filter causes gritty residue and poor cleaning.",
     "symptoms_fixed": ["Dishes not getting clean", "Gritty residue on dishes", "Odor in dishwasher"],
-    "compatible_brands": ["Whirlpool", "Kenmore", "Maytag", "KitchenAid", "JennAir"],
+    "compatible_products": ["Whirlpool", "Kenmore", "Maytag", "KitchenAid", "JennAir"],
     "compatible_models": ["WDT780SAEM1", "WDT750SAHZ0", "WDF520PADM"],
     "replaces_parts": ["AP5650063", "W10463906", "W10872845"],
     "install": {
@@ -486,7 +486,7 @@
     "url": "https://www.partselect.com/PS11728247-Whirlpool-WPW10671904-Silverware-Basket.htm",
     "description": "Replacement silverware basket for the lower rack. Swap out when the basket cracks or the lid tabs break.",
     "symptoms_fixed": ["Cracked or broken basket", "Lid won't stay closed"],
-    "compatible_brands": ["Whirlpool", "Kenmore", "Maytag", "KitchenAid"],
+    "compatible_products": ["Whirlpool", "Kenmore", "Maytag", "KitchenAid"],
     "compatible_models": ["WDT780SAEM1", "WDT750SAHZ0"],
     "replaces_parts": ["AP5985073", "W10671904"],
     "install": {
@@ -517,7 +517,7 @@
     "url": "https://www.partselect.com/PS11744319-Whirlpool-W10861000-Detergent-Dispenser.htm",
     "description": "Detergent dispenser assembly mounted in the door. Replace when the dispenser door won't open during the cycle or detergent is left behind.",
     "symptoms_fixed": ["Detergent not dispensing", "Dispenser door won't open", "Dishes not getting clean"],
-    "compatible_brands": ["Whirlpool", "Kenmore", "Maytag", "KitchenAid"],
+    "compatible_products": ["Whirlpool", "Kenmore", "Maytag", "KitchenAid"],
     "compatible_models": ["WDT780SAEM1", "WDT750SAHZ0"],
     "replaces_parts": ["AP5984371", "W10861000", "W10224428"],
     "install": {
@@ -551,7 +551,7 @@
     "url": "https://www.partselect.com/PS11739618-Whirlpool-WP8269145-Dishwasher-Mounting-Bracket.htm",
     "description": "Upper mounting bracket that secures the dishwasher to the underside of the counter to stop it from rocking or tipping when the door opens. Sold individually, without screws.",
     "symptoms_fixed": ["Dishwasher tips forward", "Dishwasher shakes or moves"],
-    "compatible_brands": ["Whirlpool", "Kenmore", "Maytag", "KitchenAid", "JennAir"],
+    "compatible_products": ["Whirlpool", "Kenmore", "Maytag", "KitchenAid", "JennAir"],
     "compatible_models": ["WDT780SAEM1", "WDT750SAHZ0", "WDF520PADM"],
     "replaces_parts": ["AP6011694", "8269145", "WP8269145VP"],
     "install": {

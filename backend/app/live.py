@@ -392,11 +392,19 @@ class PartSelectClient:
         if dm:
             desc = _clean(dm.group(0).rstrip("."))
 
+        image_url = ""
+        img = card.find("img")
+        if img:
+            image_url = img.get("data-src") or img.get("src") or ""
+            if image_url.startswith("data:"):
+                image_url = ""
+
         return self._part_dict(
             ps_number=ps, mfr_number=mfr, name=_clean(name),
             brand=brand, appliance_type=appliance, price=price,
             in_stock="out of stock" not in block.lower(),
             rating=None, review_count=reviews, url=url, description=desc,
+            image_url=image_url,
         )
 
     def _parse_part_page(self, html: bytes, url: str, ps: str) -> dict:
@@ -484,14 +492,14 @@ class PartSelectClient:
                     seen_models.add(mn)
                     models.append(mn)
 
-        compatible_brands = []
+        compatible_products = []
         brands_section = soup.find(string=re.compile(r"works with the following products", re.I))
         if brands_section:
             p = brands_section.find_parent()
             if p:
                 sib = p.find_next(["ul", "div"])
                 if sib:
-                    compatible_brands = [_clean(li.get_text()) for li in sib.find_all(["li", "a"])
+                    compatible_products = [_clean(li.get_text()) for li in sib.find_all(["li", "a"])
                                          if _clean(li.get_text()) and _clean(li.get_text())[0].isupper()][:12]
 
         install = self._extract_install(soup, html)
@@ -502,7 +510,7 @@ class PartSelectClient:
             rating=rating, review_count=reviews,
             image_url=img["src"] if img and img.get("src") else "",
             url=url.split("?")[0], description=desc,
-            symptoms_fixed=symptoms, compatible_brands=compatible_brands,
+            symptoms_fixed=symptoms, compatible_products=compatible_products,
             compatible_models=models[:50], replaces_parts=replaces,
             install=install,
         )
@@ -616,6 +624,91 @@ class PartSelectClient:
             return None
         return self._parse_symptom_detail(html, symptom_url)
 
+    def fetch_model_symptoms(self, model_number: str) -> list[dict]:
+        """Fetch the symptom list for a specific model from its overview page.
+        Returns [{"title": str, "url": str}, ...]."""
+        if not self.enabled or not model_number:
+            return []
+        m = re.sub(r"\s+", "", model_number).upper()
+        html = self._get(f"{BASE}/Models/{m}/")
+        if not html:
+            return []
+        soup = BeautifulSoup(html, "html.parser")
+        results = []
+        seen = set()
+        for a in soup.find_all("a", href=lambda h: h and "/Symptoms/" in (h or "")):
+            href = a.get("href", "")
+            text = a.get_text(strip=True)
+            title = re.sub(r"Fixed by.*", "", text).strip()
+            if not title or title in seen:
+                continue
+            seen.add(title)
+            if href.startswith("/"):
+                href = BASE + href
+            results.append({"title": title, "url": href})
+        return results
+
+    def fetch_model_symptom_parts(self, symptom_url: str) -> Optional[dict]:
+        """Fetch a model-specific symptom page and return parts that fix it,
+        with fix-percentage data.
+        Returns {"symptom": str, "parts": [{"ps_number", "name", "mfr_number",
+                 "price", "in_stock", "fix_pct", "url"}, ...]} or None."""
+        if not self.enabled or not symptom_url:
+            return None
+        if symptom_url.startswith("/"):
+            symptom_url = BASE + symptom_url
+        html = self._get(symptom_url)
+        if not html:
+            return None
+        return self._parse_model_symptom_page(html, symptom_url)
+
+    @staticmethod
+    def _parse_model_symptom_page(html: bytes, url: str) -> Optional[dict]:
+        soup = BeautifulSoup(html, "html.parser")
+        h1 = soup.find("h1")
+        symptom_name = _clean(h1.get_text()) if h1 else ""
+
+        parts = []
+        for container in soup.find_all(class_="symptoms"):
+            block = container.get_text(" ", strip=True)
+            ps, name, part_url = "", "", ""
+            for a in container.find_all("a", href=PS_URL_RE):
+                t = a.get_text(strip=True)
+                mt = PS_URL_RE.search(a["href"])
+                if mt:
+                    ps = mt.group(1).upper()
+                    part_url = a["href"].split("?")[0]
+                    if part_url.startswith("/"):
+                        part_url = BASE + part_url
+                    if t and not re.match(r"^[A-Z0-9]+$", t) and t != ps:
+                        name = t
+            if not ps:
+                continue
+            if not name:
+                name = _name_from_url(part_url) or ps
+
+            pct_match = re.search(r"(\d+)\s*%", block)
+            fix_pct = int(pct_match.group(1)) if pct_match else 0
+
+            price_match = re.search(r"\$\s*(\d+(?:\.\d{2})?)", block)
+            price = float(price_match.group(1)) if price_match else 0.0
+
+            mfr_match = re.search(r"Part Number:\s*(\S+)", block)
+            mfr = mfr_match.group(1) if mfr_match else ""
+
+            in_stock = "in stock" in block.lower()
+
+            parts.append({
+                "ps_number": ps, "name": name, "mfr_number": mfr,
+                "price": price, "in_stock": in_stock,
+                "fix_pct": fix_pct, "url": part_url,
+            })
+
+        if not parts:
+            return None
+        parts.sort(key=lambda p: p["fix_pct"], reverse=True)
+        return {"symptom": symptom_name, "url": url, "parts": parts}
+
     @staticmethod
     def _parse_symptom_index(html: bytes) -> list[dict]:
         soup = BeautifulSoup(html, "html.parser")
@@ -689,7 +782,7 @@ class PartSelectClient:
             "ps_number": "", "mfr_number": "", "name": "", "brand": "",
             "appliance_type": "", "category": "", "price": 0.0, "in_stock": True,
             "rating": None, "review_count": 0, "image_url": "", "url": "",
-            "description": "", "symptoms_fixed": [], "compatible_brands": [],
+            "description": "", "symptoms_fixed": [], "compatible_products": [],
             "compatible_models": [], "replaces_parts": [], "install": {},
             "verified": True, "source": "live",
         }

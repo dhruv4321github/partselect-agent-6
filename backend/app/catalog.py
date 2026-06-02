@@ -219,8 +219,8 @@ class PartsRepository:
         elif model is None:
             result["reason"] = (
                 f"Model {model_number} isn't in our records, so compatibility can't "
-                f"be confirmed automatically. {part['name']} fits these brands: "
-                f"{', '.join(part.get('compatible_brands', []))}."
+                f"be confirmed automatically. {part['name']} works with: "
+                f"{', '.join(part.get('compatible_products', []))}."
             )
         else:
             result["reason"] = (
@@ -263,27 +263,13 @@ class PartsRepository:
     # ---- repair help ---------------------------------------------------
     def find_repair_help(self, appliance_type: str, symptom: str, brand: str = None) -> dict:
         """Search for parts that fix a symptom. Returns:
-        {"source": "live"|"static"|"none", "parts": [...], "guide": {...}|None}
+        {"source": "symptom_list"|"static"|"none", ...}
 
         Priority chain:
-          1. Local catalog search (parts with symptoms_fixed data)
-          2. Live PartSelect /Repair/ symptom pages (scraped causes + advice)
-          3. Static repair_help.json guides (curated fallback)"""
+          1. Live PartSelect /Repair/ symptom pages (scraped causes + advice)
+          2. Static repair_help.json guides (curated fallback)"""
 
-        # 1) Search the live catalog for parts whose symptoms match.
-        parts = self.index.search(
-            symptom, appliance_type=appliance_type, brand=brand, limit=6,
-        )
-        enriched = []
-        for p in parts:
-            if p.get("symptoms_fixed"):
-                enriched.append(self._enrich_part(p))
-            elif not enriched:
-                enriched.append(self._enrich_part(p))
-        if enriched:
-            return {"source": "live", "parts": enriched[:5], "guide": None}
-
-        # 2) Live PartSelect /Repair/ pages: return symptom list for the LLM
+        # 1) Live PartSelect /Repair/ pages: return symptom list for the LLM
         #    to pick from (it calls get_symptom_repair_guide next).
         if self.live.enabled and appliance_type:
             symptoms_list = self.live.fetch_repair_symptoms(appliance_type)
@@ -302,6 +288,62 @@ class PartsRepository:
         """Fetch a specific symptom detail page from PartSelect. Called by the
         get_symptom_repair_guide tool after the LLM picks the best symptom."""
         return self.live.fetch_symptom_detail(symptom_url)
+
+    def fetch_model_symptoms(self, model_number: str) -> list[dict]:
+        """Return the symptom list for a specific model. Uses cached data
+        from models.json if available, otherwise fetches live."""
+        key = (model_number or "").strip().upper().replace(" ", "")
+        model = self.models.get(key)
+        if model and model.get("symptoms"):
+            return model["symptoms"]
+        symptoms = self.live.fetch_model_symptoms(model_number)
+        if symptoms:
+            if not model:
+                model = self.get_model(model_number)
+            if not model:
+                model = {"model_number": key, "brand": "", "appliance_type": "",
+                         "compatible_parts": [], "verified": True, "source": "live"}
+                self._remember_model(model)
+            model["symptoms"] = symptoms
+            self._persist_models()
+        return symptoms
+
+    def fetch_model_symptom_parts(self, model_number: str, symptom_url: str) -> Optional[list]:
+        """Fetch parts that fix a specific symptom on a specific model.
+        Returns a list of {ps_number, name, fix_pct, ...} dicts.
+        Caches under model.symptoms_data[symptom_title] in models.json."""
+        key = (model_number or "").strip().upper().replace(" ", "")
+        model = self.models.get(key)
+
+        result = self.live.fetch_model_symptom_parts(symptom_url)
+        if not result or not result.get("parts"):
+            return None
+
+        if not model:
+            model = {"model_number": key, "brand": "", "appliance_type": "",
+                     "compatible_parts": [], "verified": True, "source": "live"}
+            self._remember_model(model)
+        if "symptoms_data" not in model:
+            model["symptoms_data"] = {}
+        model["symptoms_data"][result["symptom"]] = result["parts"]
+        self._persist_models()
+
+        return result["parts"]
+
+    def get_cached_symptom_parts(self, model_number: str, symptom: str) -> Optional[list]:
+        """Return cached symptom parts from models.json if available."""
+        key = (model_number or "").strip().upper().replace(" ", "")
+        model = self.models.get(key)
+        if not model or not model.get("symptoms_data"):
+            return None
+        return model["symptoms_data"].get(symptom)
+
+    def _persist_models(self):
+        if self.persist:
+            try:
+                _save("models.json", list(self.models.values()))
+            except Exception:
+                pass
 
     def _match_static_guide(self, appliance_type: str, symptom: str) -> Optional[dict]:
         """Match a symptom against the curated repair_help.json entries."""

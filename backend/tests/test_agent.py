@@ -91,10 +91,16 @@ def test_parts_for_model():
 # ── Cart + orders (transaction assist) ────────────────────────────────
 
 def test_add_to_cart_computes_line_total():
+    from app.tools import cart as _cart
+    _cart.clear()
     r = execute_tool("add_to_cart", {"part_number": "PS11752778", "quantity": 2})
-    cart = next(c for c in r["cards"] if c["type"] == "cart")
-    assert cart["quantity"] == 2
-    assert round(cart["line_total"], 2) == round(cart["part"]["price"] * 2, 2)
+    card = next(c for c in r["cards"] if c["type"] == "cart")
+    assert card["item_count"] >= 2
+    assert card["total"] > 0
+    item = card["items"][0]
+    assert item["quantity"] == 2
+    assert round(item["line_total"], 2) == round(item["price"] * 2, 2)
+    _cart.clear()
 
 
 def test_lookup_order():

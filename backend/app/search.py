@@ -62,7 +62,7 @@ class SearchIndex:
         for part in self.parts:
             if appliance_type and part["appliance_type"].lower() != appliance_type.lower():
                 continue
-            if brand and brand.lower() not in [b.lower() for b in part.get("compatible_brands", [])] \
+            if brand and brand.lower() not in [b.lower() for b in part.get("compatible_products", [])] \
                     and part["brand"].lower() != brand.lower():
                 continue
             score = self._score(part["ps_number"], query_tokens)

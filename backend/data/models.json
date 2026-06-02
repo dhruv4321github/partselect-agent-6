@@ -1,27 +1,6 @@
 [
   {
-    "model_number": "10640212010",
-    "brand": "Kenmore",
-    "appliance_type": "Refrigerator",
-    "compatible_parts": [
-      "PS884734",
-      "PS11739042",
-      "PS11739122",
-      "PS11752991",
-      "PS11739120",
-      "PS11723171",
-      "PS11751713",
-      "PS12728638",
-      "PS11750673",
-      "PS11739232",
-      "PS1957416",
-      "PS4082908"
-    ],
-    "verified": true,
-    "source": "live"
-  },
-  {
-    "model_number": "10640569011",
+    "model_number": "10640262010",
     "brand": "Kenmore",
     "appliance_type": "Refrigerator",
     "compatible_parts": [
@@ -32,34 +11,149 @@
       "PS11752991",
       "PS11751713",
       "PS12728638",
-      "PS11757023",
       "PS11750673",
       "PS11751711",
       "PS4082908",
+      "PS11743364",
       "PS17629131"
     ],
     "verified": true,
-    "source": "live"
-  },
-  {
-    "model_number": "WDT780SAEM1",
-    "brand": "Whirlpool",
-    "appliance_type": "Dishwasher",
-    "compatible_parts": [
-      "PS3406971",
-      "PS10065979",
-      "PS11746591",
-      "PS972325",
-      "PS11745496",
-      "PS11750093",
-      "PS12348515",
-      "PS11753379",
-      "PS11750092",
-      "PS11755592",
-      "PS11755736",
-      "PS11759673"
+    "source": "live",
+    "symptoms": [
+      {
+        "title": "Door won\u2019t open or close",
+        "url": "https://www.partselect.com/Models/10640262010/Symptoms/Door-won\u2019t-open-or-close/"
+      },
+      {
+        "title": "Light not working",
+        "url": "https://www.partselect.com/Models/10640262010/Symptoms/Light-not-working/"
+      },
+      {
+        "title": "Fridge too warm",
+        "url": "https://www.partselect.com/Models/10640262010/Symptoms/Fridge-too-warm/"
+      },
+      {
+        "title": "Noisy",
+        "url": "https://www.partselect.com/Models/10640262010/Symptoms/Noisy/"
+      },
+      {
+        "title": "Clicking sound",
+        "url": "https://www.partselect.com/Models/10640262010/Symptoms/Clicking-sound/"
+      },
+      {
+        "title": "Will Not Start",
+        "url": "https://www.partselect.com/Models/10640262010/Symptoms/Will-Not-Start/"
+      },
+      {
+        "title": "Freezer section too warm",
+        "url": "https://www.partselect.com/Models/10640262010/Symptoms/Freezer-section-too-warm/"
+      },
+      {
+        "title": "Freezer not defrosting",
+        "url": "https://www.partselect.com/Models/10640262010/Symptoms/Freezer-not-defrosting/"
+      },
+      {
+        "title": "Leaking",
+        "url": "https://www.partselect.com/Models/10640262010/Symptoms/Leaking/"
+      },
+      {
+        "title": "Fridge and Freezer are too warm",
+        "url": "https://www.partselect.com/Models/10640262010/Symptoms/Fridge-and-Freezer-are-too-warm/"
+      },
+      {
+        "title": "Ice maker not making ice",
+        "url": "https://www.partselect.com/Models/10640262010/Symptoms/Ice-maker-not-making-ice/"
+      },
+      {
+        "title": "Door Sweating",
+        "url": "https://www.partselect.com/Models/10640262010/Symptoms/Door-Sweating/"
+      },
+      {
+        "title": "Fridge too cold",
+        "url": "https://www.partselect.com/Models/10640262010/Symptoms/Fridge-too-cold/"
+      },
+      {
+        "title": "Frost buildup",
+        "url": "https://www.partselect.com/Models/10640262010/Symptoms/Frost-buildup/"
+      },
+      {
+        "title": "Freezer too cold",
+        "url": "https://www.partselect.com/Models/10640262010/Symptoms/Freezer-too-cold/"
+      },
+      {
+        "title": "Too warm",
+        "url": "https://www.partselect.com/Models/10640262010/Symptoms/Too-warm/"
+      },
+      {
+        "title": "Ice maker won\u2019t dispense ice",
+        "url": "https://www.partselect.com/Models/10640262010/Symptoms/Ice-maker-won\u2019t-dispense-ice/"
+      },
+      {
+        "title": "Fridge runs too long",
+        "url": "https://www.partselect.com/Models/10640262010/Symptoms/Fridge-runs-too-long/"
+      },
+      {
+        "title": "Touchpad does not respond",
+        "url": "https://www.partselect.com/Models/10640262010/Symptoms/Touchpad-does-not-respond/"
+      }
     ],
-    "verified": true,
-    "source": "live"
+    "symptoms_data": {
+      "10640262010 Kenmore Refrigerator - Symptoms": [
+        {
+          "ps_number": "PS11739042",
+          "name": "Refrigerator Lower Door Closing Cam",
+          "mfr_number": "WP2182179",
+          "price": 9.62,
+          "in_stock": true,
+          "fix_pct": 52,
+          "url": "https://www.partselect.com/PS11739042-Whirlpool-WP2182179-Refrigerator-Lower-Door-Closing-Cam.htm"
+        },
+        {
+          "ps_number": "PS11752991",
+          "name": "Refrigerator Door Cam",
+          "mfr_number": "WPW10329686",
+          "price": 9.62,
+          "in_stock": true,
+          "fix_pct": 34,
+          "url": "https://www.partselect.com/PS11752991-Whirlpool-WPW10329686-Refrigerator-Door-Cam.htm"
+        },
+        {
+          "ps_number": "PS11743364",
+          "name": "WP65889-4",
+          "mfr_number": "WP65889-4",
+          "price": 54.24,
+          "in_stock": true,
+          "fix_pct": 8,
+          "url": "https://www.partselect.com/PS11743364-Whirlpool-WP65889-4-Refrigerator-Run-Capacitor.htm"
+        },
+        {
+          "ps_number": "PS11739119",
+          "name": "Refrigerator Crisper Drawer with Humidity Control",
+          "mfr_number": "WP2188656",
+          "price": 88.88,
+          "in_stock": true,
+          "fix_pct": 2,
+          "url": "https://www.partselect.com/PS11739119-Whirlpool-WP2188656-Refrigerator-Crisper-Drawer-with-Humidity-Control.htm"
+        },
+        {
+          "ps_number": "PS11741512",
+          "name": "Refrigerator Installation Screw",
+          "mfr_number": "WP3400012",
+          "price": 7.47,
+          "in_stock": true,
+          "fix_pct": 2,
+          "url": "https://www.partselect.com/PS11741512-Whirlpool-WP3400012-Refrigerator-Installation-Screw.htm"
+        },
+        {
+          "ps_number": "PS11739043",
+          "name": "Refrigerator Thimble Top",
+          "mfr_number": "WP2182181",
+          "price": 9.62,
+          "in_stock": true,
+          "fix_pct": 2,
+          "url": "https://www.partselect.com/PS11739043-Whirlpool-WP2182181-Refrigerator-Thimble-Top.htm"
+        }
+      ]
+    }
   }
 ]

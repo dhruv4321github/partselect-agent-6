@@ -2,25 +2,48 @@ import React from "react";
 import "./cards.css";
 
 function CartCard({ card }) {
-  const { quantity, line_total, cart_url, part } = card;
-  const name = part?.name || "Item";
+  const { items = [], item_count = 0, total = 0 } = card;
 
-  return (
-    <div className="card cart">
-      <span className="cart-check">✓</span>
-      <div className="cart-info">
-        <div className="cart-title">Added to cart</div>
-        <div className="cart-sub">
-          {quantity} × {name}
-          {part?.ps_number ? ` · ${part.ps_number}` : ""}
+  if (!items.length) {
+    return (
+      <div className="card cart">
+        <span className="cart-check">✓</span>
+        <div className="cart-info">
+          <div className="cart-title">Cart is empty</div>
         </div>
       </div>
-      {line_total != null && <span className="cart-total">${Number(line_total).toFixed(2)}</span>}
-      {cart_url && (
-        <a className="btn btn-primary" href={cart_url} target="_blank" rel="noreferrer">
-          View cart
-        </a>
-      )}
+    );
+  }
+
+  return (
+    <div className="card cart-card">
+      <div className="card-head">
+        <div className="card-head-icon" style={{ background: "var(--ok)" }}>🛒</div>
+        <div>
+          <div className="card-head-title">Your Cart</div>
+          <div className="card-head-sub">{item_count} item{item_count !== 1 ? "s" : ""}</div>
+        </div>
+      </div>
+      <div className="card-content">
+        <div className="cart-items">
+          {items.map((item, i) => (
+            <div className="cart-item" key={item.ps_number || i}>
+              <div className="cart-item-info">
+                <span className="cart-item-name">{item.name}</span>
+                <span className="cart-item-meta">{item.ps_number}</span>
+              </div>
+              <div className="cart-item-right">
+                <span className="cart-item-qty">×{item.quantity}</span>
+                <span className="cart-item-price">${Number(item.line_total).toFixed(2)}</span>
+              </div>
+            </div>
+          ))}
+        </div>
+        <div className="cart-footer">
+          <span className="cart-footer-label">Total</span>
+          <span className="cart-footer-total">${Number(total).toFixed(2)}</span>
+        </div>
+      </div>
     </div>
   );
 }

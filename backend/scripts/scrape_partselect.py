@@ -90,7 +90,7 @@ class Part:
     url: str = ""
     description: str = ""
     symptoms_fixed: list = field(default_factory=list)
-    compatible_brands: list = field(default_factory=list)
+    compatible_products: list = field(default_factory=list)
     compatible_models: list = field(default_factory=list)
     replaces_parts: list = field(default_factory=list)
     install: dict = field(default_factory=dict)
@@ -275,7 +275,7 @@ def parse_part_page(html: bytes, url: str) -> Optional[Part]:
 
     # "This part works with the following products" → brands.
     brands = _list_after_label(soup, "works with the following products")
-    part.compatible_brands = [b for b in brands if b and b[0].isupper()][:12]
+    part.compatible_products = [b for b in brands if b and b[0].isupper()][:12]
 
     # "Replaces these parts" / "Part# replaces".
     repl = re.search(r"replaces?[^A-Za-z0-9]+([A-Z0-9,\s]+)", text)
@@ -289,8 +289,8 @@ def parse_part_page(html: bytes, url: str) -> Optional[Part]:
             part.appliance_type = c
         elif c and c not in ("Home", "Parts") and not c.endswith("Parts"):
             part.category = c
-    if not part.brand and part.compatible_brands:
-        part.brand = part.compatible_brands[0]
+    if not part.brand and part.compatible_products:
+        part.brand = part.compatible_products[0]
 
     return part
 
