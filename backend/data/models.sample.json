@@ -1,0 +1,91 @@
+[
+  {
+    "model_number": "WDT780SAEM1",
+    "brand": "Whirlpool",
+    "appliance_type": "Dishwasher",
+    "description": "Whirlpool built-in undercounter dishwasher with stainless tub and adjustable upper rack.",
+    "compatible_parts": [
+      "PS11770283",
+      "PS11763136",
+      "PS11750673",
+      "PS11722128",
+      "PS11746180",
+      "PS11725861",
+      "PS11728247",
+      "PS11744319",
+      "PS11739618"
+    ]
+  },
+  {
+    "model_number": "WDT750SAHZ0",
+    "brand": "Whirlpool",
+    "appliance_type": "Dishwasher",
+    "description": "Whirlpool dishwasher with third rack and sensor cycle.",
+    "compatible_parts": [
+      "PS11770283",
+      "PS11763136",
+      "PS11750673",
+      "PS11722128",
+      "PS11746180",
+      "PS11725861",
+      "PS11728247",
+      "PS11744319",
+      "PS11739618"
+    ]
+  },
+  {
+    "model_number": "WDF520PADM",
+    "brand": "Whirlpool",
+    "appliance_type": "Dishwasher",
+    "description": "Whirlpool front-control dishwasher.",
+    "compatible_parts": [
+      "PS11770283",
+      "PS11763136",
+      "PS11750673",
+      "PS11746180",
+      "PS11725861",
+      "PS11739618"
+    ]
+  },
+  {
+    "model_number": "WRS325SDHZ08",
+    "brand": "Whirlpool",
+    "appliance_type": "Refrigerator",
+    "description": "Whirlpool side-by-side refrigerator with exterior ice and water dispenser.",
+    "compatible_parts": [
+      "PS11752778",
+      "PS11757030",
+      "PS11722148",
+      "PS11739136",
+      "PS11743427",
+      "PS12364199",
+      "PS11703459",
+      "PS11756692"
+    ]
+  },
+  {
+    "model_number": "ED5FVGXWS07",
+    "brand": "Whirlpool",
+    "appliance_type": "Refrigerator",
+    "description": "Whirlpool side-by-side refrigerator (the model used in the PS11752778 listing example).",
+    "compatible_parts": [
+      "PS11752778",
+      "PS11757030",
+      "PS11722148",
+      "PS11739136",
+      "PS11743427",
+      "PS11703459"
+    ]
+  },
+  {
+    "model_number": "WRX735SDHZ00",
+    "brand": "Whirlpool",
+    "appliance_type": "Refrigerator",
+    "description": "Whirlpool French door refrigerator.",
+    "compatible_parts": [
+      "PS11757030",
+      "PS12364199",
+      "PS11756692"
+    ]
+  }
+]

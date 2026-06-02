@@ -1,0 +1,53 @@
+.suggest {
+  display: flex;
+  flex-direction: column;
+  gap: 9px;
+  margin-top: 4px;
+}
+.suggest.compact {
+  margin-top: 10px;
+  max-width: 84%;
+}
+
+.suggest-title {
+  font-size: 12.5px;
+  font-weight: 600;
+  color: var(--ink-faint);
+  padding-left: 2px;
+}
+
+.suggest-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.chip {
+  border: 1px solid var(--ps-teal-tint-2);
+  background: var(--surface);
+  color: var(--ps-teal-dark);
+  font-family: var(--font);
+  font-size: 13px;
+  font-weight: 500;
+  line-height: 1.3;
+  text-align: left;
+  padding: 8px 13px;
+  border-radius: 999px;
+  cursor: pointer;
+  transition: all 0.15s var(--ease);
+}
+.chip:hover {
+  background: var(--ps-teal-tint);
+  border-color: var(--ps-teal);
+  transform: translateY(-1px);
+}
+.suggest.compact .chip {
+  font-size: 12.5px;
+  padding: 6px 12px;
+}
+
+@media (max-width: 640px) {
+  .suggest.compact {
+    max-width: 92%;
+  }
+}

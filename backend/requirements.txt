@@ -1,0 +1,16 @@
+fastapi==0.115.6
+uvicorn[standard]==0.34.0
+pydantic==2.10.4
+python-dotenv==1.0.1
+anthropic==0.42.0
+openai==1.59.6
+
+# Live catalog fetch (optional — only if LIVE_FETCH=true). Imports are guarded,
+# so the app runs fine without these when live is off (the default).
+requests==2.32.3
+beautifulsoup4==4.12.3
+lxml==5.3.0
+# PartSelect's CDN (Akamai) blocks plain `requests` with a 403. curl_cffi
+# impersonates a real browser's TLS fingerprint and gets past it. Install this
+# if you want live fetch to actually work:  pip install curl_cffi
+curl_cffi==0.7.1

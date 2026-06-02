@@ -1,0 +1,37 @@
+.model-pin {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  background: var(--ps-gold-tint);
+  border: 1px solid var(--ps-gold);
+  border-radius: 999px;
+  padding: 4px 6px 4px 12px;
+  margin-bottom: 9px;
+  font-size: 12.5px;
+}
+.model-pin-label {
+  color: var(--warn);
+  font-weight: 600;
+}
+.model-pin-value {
+  font-weight: 700;
+  color: var(--ink);
+  font-family: ui-monospace, "SF Mono", Menlo, monospace;
+  letter-spacing: 0.3px;
+}
+.model-pin-clear {
+  border: none;
+  background: rgba(0, 0, 0, 0.06);
+  color: var(--ink-soft);
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  cursor: pointer;
+  font-size: 10px;
+  line-height: 1;
+  display: grid;
+  place-items: center;
+}
+.model-pin-clear:hover {
+  background: rgba(0, 0, 0, 0.12);
+}

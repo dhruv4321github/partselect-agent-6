@@ -1,0 +1,65 @@
+[
+  {
+    "model_number": "10640212010",
+    "brand": "Kenmore",
+    "appliance_type": "Refrigerator",
+    "compatible_parts": [
+      "PS884734",
+      "PS11739042",
+      "PS11739122",
+      "PS11752991",
+      "PS11739120",
+      "PS11723171",
+      "PS11751713",
+      "PS12728638",
+      "PS11750673",
+      "PS11739232",
+      "PS1957416",
+      "PS4082908"
+    ],
+    "verified": true,
+    "source": "live"
+  },
+  {
+    "model_number": "10640569011",
+    "brand": "Kenmore",
+    "appliance_type": "Refrigerator",
+    "compatible_parts": [
+      "PS11739119",
+      "PS11752778",
+      "PS11739042",
+      "PS11739122",
+      "PS11752991",
+      "PS11751713",
+      "PS12728638",
+      "PS11757023",
+      "PS11750673",
+      "PS11751711",
+      "PS4082908",
+      "PS17629131"
+    ],
+    "verified": true,
+    "source": "live"
+  },
+  {
+    "model_number": "WDT780SAEM1",
+    "brand": "Whirlpool",
+    "appliance_type": "Dishwasher",
+    "compatible_parts": [
+      "PS3406971",
+      "PS10065979",
+      "PS11746591",
+      "PS972325",
+      "PS11745496",
+      "PS11750093",
+      "PS12348515",
+      "PS11753379",
+      "PS11750092",
+      "PS11755592",
+      "PS11755736",
+      "PS11759673"
+    ],
+    "verified": true,
+    "source": "live"
+  }
+]
