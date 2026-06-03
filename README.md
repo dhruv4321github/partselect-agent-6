@@ -12,30 +12,30 @@ answer is grounded in returned data rather than the model's memory.
 
 ```
 ┌──────────────────────────────────────────────────────────────────────┐
-│  React frontend (CRA)                                              │
-│  ChatWindow ── streams tokens ──► rich cards (product /            │
-│       │                           compatibility / cart)            │
-└───────┼────────────────────────────────────────────────────────────┘
+│  React frontend (CRA)                                                │
+│  ChatWindow ── streams tokens ──► rich cards (product /              │
+│       │                           compatibility / cart)              │
+└───────┼──────────────────────────────────────────────────────────────┘
         │  POST /api/chat/stream  (Server-Sent Events)
         ▼
 ┌──────────────────────────────────────────────────────────────────────┐
-│  FastAPI backend                                                   │
-│                                                                    │
-│   agent.run_agent()                                                │
-│        │   empty-input backstop · card de-dupe · suggestion cap    │
-│        ▼                                                           │
-│   LLMClient.converse()   ◄── provider-agnostic (Anthropic | OpenAI │
-│        │   tool loop                 -compatible: OpenAI / etc.)   │
-│        ▼                                                           │
-│   execute_tool(name,args)  ──►  10 tools                           │
-│        │                         search · details · compatibility ·│
-│        │                         install · repair · symptom guide ·│
-│        │                         model parts · model diagnosis ·   │
-│        ▼                         cart (add/view/remove)            │
-│   PartsRepository  ◄── SearchIndex + PartSelectClient (live)       │
-│        │                                                           │
-│        ▼                                                           │
-│   on-demand live scraping ── cached to disk ── persisted to JSON   │
+│  FastAPI backend                                                     │
+│                                                                      │
+│   agent.run_agent()                                                  │
+│        │   empty-input backstop · card de-dupe · suggestion cap      │
+│        ▼                                                             │
+│   LLMClient.converse()   ◄── provider-agnostic (Anthropic | OpenAI   │
+│        │   tool loop                 -compatible: OpenAI / etc.)     │
+│        ▼                                                             │
+│   execute_tool(name,args)  ──►  10 tools                             │
+│        │                         search · details · compatibility ·  │
+│        │                         install · repair · symptom guide ·  │
+│        │                         model parts · model diagnosis ·     │
+│        ▼                         cart (add/view/remove)              │
+│   PartsRepository  ◄── SearchIndex + PartSelectClient (live)         │
+│        │                                                             │
+│        ▼                                                             │
+│   on-demand live scraping ── cached to disk ── persisted to JSON     │
 └──────────────────────────────────────────────────────────────────────┘
 ```
 
@@ -66,7 +66,8 @@ npm install
 npm start                      # opens http://localhost:3000
 ```
 
-The dev server proxies `/api` to `localhost:8000`, so no extra config is needed.
+The dev server proxies `/api` to `localhost:8000` via a custom `setupProxy.js`
+(SSE-aware, no response buffering), so no extra config is needed.
 
 ### 3. Try it
 
@@ -162,8 +163,11 @@ assert this at the data layer independently of the model.
 ### Structured cards separate from prose
 
 Returning data as cards (not as text the model rewrites) keeps the UX rich *and*
-accurate, and it's the main extensibility seam on the frontend — a new card type
-is one component + one `case` in `Message.js`.
+accurate, and it's the main extensibility seam on the frontend -- a new card type
+is one component + one `case` in `Message.js`. Every tool that surfaces a part
+(install guide, compatibility check, search, model diagnosis) returns a product
+card alongside the text summary, so the user always has the image, price, and
+direct link to PartSelect without relying on the LLM to include them.
 
 ### Scope enforcement, two layers
 
@@ -278,6 +282,7 @@ partselect-agent/
 │   └── .env.example
 └── frontend/
     └── src/
+        ├── setupProxy.js    custom proxy: SSE-aware, disables response buffering
         ├── ChatWindow.js    streaming chat, starter chips, model pin, health
         ├── Message.js       markdown bubble + card dispatch + follow-up chips
         ├── api/api.js       SSE client with non-streaming fallback
@@ -310,6 +315,7 @@ For a clean slate, reset both files to `[]` and restart the server.
 | JSON file storage vs. database | Zero-dependency, easy to inspect/reset | No concurrent writes, doesn't scale past a single instance |
 | `gpt-4o-mini` vs. larger models | Fast, cheap, good enough for tool-calling | Occasionally needs explicit anti-hallucination instructions |
 | Keyword search vs. vector/semantic | No embedding model dependency, instant | Misses synonyms and fuzzy matches |
+| CRA dev proxy + SSE | Simple setup, custom `setupProxy.js` fixes buffering | CRA is deprecated upstream; Next.js migration is straightforward |
 | Scraper parsing HTML selectors | Works with the current PartSelect markup | Fragile to site redesigns (degrades gracefully, never crashes) |
 | Appliance scope (fridge + dishwasher) | Tight, testable, demonstrable | Would need prompt + data changes to widen |
 

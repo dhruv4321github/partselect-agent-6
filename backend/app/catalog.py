@@ -228,7 +228,10 @@ class PartsRepository:
             if p:
                 parts.append(p)
         if category:
-            parts = [p for p in parts if category.lower() in p.get("category", "").lower()]
+            cat = category.lower()
+            parts = [p for p in parts
+                     if cat in p.get("category", "").lower()
+                     or cat in p.get("name", "").lower()]
         return {"status": "ok", "model": model, "parts": parts}
 
     # ---- repair help ---------------------------------------------------

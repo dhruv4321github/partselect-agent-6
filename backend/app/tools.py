@@ -340,7 +340,7 @@ def tool_get_installation_guide(part_number):
             lines.append(f"  {i}. {s}")
 
     summary = "\n".join(lines)
-    return {"summary": summary, "cards": [],
+    return {"summary": summary, "cards": [repo.to_product_card(part)],
             "suggestions": [f"Is {part['ps_number']} compatible with my model?",
                             f"Add {part['ps_number']} to my cart"]}
 
@@ -421,9 +421,25 @@ def tool_find_parts_for_model(model_number, category=None):
         }
     parts = res["parts"]
     model = res["model"]
+    if not parts and category:
+        all_res = repo.parts_for_model(model_number, category=None)
+        all_parts = all_res.get("parts", [])
+        lines = [f"{model['brand']} {model['appliance_type']} {model['model_number']}: "
+                 f"no parts matched '{category}', but here are all {len(all_parts)} "
+                 f"available part(s) for this model."]
+        for p in all_parts:
+            price_str = f"${p['price']:.2f}" if p.get("price") else "price TBD"
+            lines.append(f"- {p['name']} (#{p['ps_number']}), {price_str}, "
+                         f"{'in stock' if p.get('in_stock', True) else 'out of stock'}")
+        return {
+            "summary": "\n".join(lines),
+            "cards": [repo.to_product_card(p) for p in all_parts],
+            "suggestions": [f"Is PS_____ compatible with {model_number}?".replace("PS_____", all_parts[0]["ps_number"])]
+            if all_parts else [],
+        }
     lines = [f"{model['brand']} {model['appliance_type']} {model['model_number']}: "
              f"{len(parts)} catalog part(s) available"
-             + (f" in category '{category}'" if category else "") + "."]
+             + (f" matching '{category}'" if category else "") + "."]
     for p in parts:
         price_str = f"${p['price']:.2f}" if p.get("price") else "price TBD"
         lines.append(f"- {p['name']} (#{p['ps_number']}), {price_str}, "

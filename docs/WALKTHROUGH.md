@@ -22,11 +22,13 @@ Click the starter chips where available so it's fast. For each, point at the
 **card**, not just the text.
 
 **1. Install** — *"How can I install part number PS11752778?"*
-- Text streams in with numbered steps, difficulty ("Really Easy"), time estimate
-  ("Less than 15 minutes"), and tools needed ("None").
-- A video guide link and a "View on PartSelect" link appear.
+- Text streams in word-by-word with numbered steps, difficulty ("Really Easy"),
+  time estimate ("Less than 15 minutes"), and tools needed ("None").
+- A product card renders below the text with the part image, price, and direct
+  "View on PartSelect" link. A video guide link also appears in the text.
 - Point: "These install steps are real customer repair stories scraped from the
-  PartSelect product page — not LLM-generated. The agent fetched this live."
+  PartSelect product page, not LLM-generated. The product card gives the user
+  a direct link to the part without relying on the model to include it."
 
 **2. Compatibility check** — *"Is PS11752778 compatible with my model?"*
 - The agent asks for the model number (it doesn't know it yet).
