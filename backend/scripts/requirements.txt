@@ -1,5 +1,0 @@
-# Extra dependencies for the optional catalog ingestion script
-# (backend/scripts/scrape_partselect.py). Not needed to run the agent itself.
-requests==2.32.3
-beautifulsoup4==4.12.3
-lxml==5.3.0
