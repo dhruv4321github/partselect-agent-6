@@ -67,9 +67,7 @@ Click the starter chips where available so it's fast. For each, point at the
 - Point: "The cart is session-based and produces production-shaped payloads —
   wiring it to a real checkout API is a backend change, not an architecture one."
 
-**6. Scope enforcement** — Two examples:
-- *"What's a good microwave?"* — off-topic question, it declines and redirects
-  to fridge/dishwasher parts.
+**6. Scope enforcement** — One example:
 - *"Can you tell me what parts are compatible with JDR8895AAS?"* — this is a
   range/stove model number. The agent recognizes it's outside its appliance scope
   and declines, even though the question is parts-related. It's not just keyword

@@ -175,7 +175,7 @@ TOOL_SCHEMAS = [
     },
     {
         "name": "view_cart",
-        "description": "Show the current contents of the customer's cart with all items and totals.",
+        "description": "Show the current contents of the customer's cart with all items and totals. ALWAYS call this when the customer asks to see or view their cart.",
         "input_schema": {
             "type": "object",
             "properties": {},
@@ -321,6 +321,18 @@ def tool_get_installation_guide(part_number):
     tools_list = ", ".join(install.get("tools_required", [])) or "no special tools"
     steps = install.get("steps", [])
     video = install.get("video_url", "")
+
+    if not install or (not steps and not install.get("difficulty")):
+        url = part.get("url", "")
+        return {
+            "summary": f"No installation data available for {part['name']} "
+                       f"(#{part['ps_number']}). Do NOT invent installation steps. "
+                       f"Tell the customer we don't have install info for this part"
+                       + (f" and suggest they check {url} for details." if url else "."),
+            "cards": [repo.to_product_card(part)],
+            "suggestions": [f"Is {part['ps_number']} compatible with my model?",
+                            f"Add {part['ps_number']} to my cart"],
+        }
 
     lines = [f"Installation info for {part['name']} (#{part['ps_number']}):"]
     if part.get("description"):
@@ -549,7 +561,9 @@ def tool_diagnose_model_symptom(model_number, symptom):
     if not model_symptoms:
         return {
             "summary": f"Could not find symptoms for model {model_number}. "
-                       f"The model may not be in PartSelect's database.",
+                       f"The model may not be in PartSelect's database. "
+                       f"Do NOT invent a diagnosis URL or fabricate symptom data. "
+                       f"Tell the customer you couldn't find symptom data for this model.",
             "cards": [],
         }
     symptom_l = symptom.lower()

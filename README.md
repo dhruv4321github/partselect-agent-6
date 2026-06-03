@@ -12,7 +12,7 @@ answer is grounded in returned data rather than the model's memory.
 
 ```
 ┌──────────────────────────────────────────────────────────────────────┐
-│  React frontend (CRA)                                                │
+│  Next.js frontend (App Router)                                       │
 │  ChatWindow ── streams tokens ──► rich cards (product /              │
 │       │                           compatibility / cart)              │
 └───────┼──────────────────────────────────────────────────────────────┘
@@ -63,11 +63,11 @@ model, and `"api_key_configured": true`.
 ```bash
 cd frontend
 npm install
-npm start                      # opens http://localhost:3000
+npm run dev                    # opens http://localhost:3000
 ```
 
-The dev server proxies `/api` to `localhost:8000` via a custom `setupProxy.js`
-(SSE-aware, no response buffering), so no extra config is needed.
+Next.js rewrites `/api` requests to `localhost:8000` (configured in
+`next.config.mjs`), so no extra config is needed.
 
 ### 3. Try it
 
@@ -290,8 +290,11 @@ partselect-agent/
 │   ├── requirements.txt
 │   └── .env.example
 └── frontend/
+    ├── app/
+    │   ├── layout.js        root layout: meta, fonts, header shell
+    │   └── page.js          "use client" entry → ChatWindow
+    ├── next.config.mjs      API rewrite: /api → localhost:8000
     └── src/
-        ├── setupProxy.js    custom proxy: SSE-aware, disables response buffering
         ├── ChatWindow.js    streaming chat, starter chips, model pin, health
         ├── Message.js       markdown bubble + card dispatch + follow-up chips
         ├── api/api.js       SSE client with non-streaming fallback
@@ -343,7 +346,7 @@ independently of the model.
 
 ## Notes
 
-- The frontend is the provided Create React App starter, upgraded in place.
+- The frontend uses Next.js (App Router) with all components as client-side React.
 - `LLM_MAX_TOKENS`, `AGENT_MAX_TOOL_STEPS`, and `CORS_ORIGINS` are tunable via env.
 - The install "steps" shown in product cards are real customer repair stories
   scraped from PartSelect's product pages (the `.repair-story` section), not

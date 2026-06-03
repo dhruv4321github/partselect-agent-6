@@ -8,11 +8,11 @@
 //  Fallback path: POST /api/chat (single JSON response) if the
 //  stream can't be opened, so the UI degrades gracefully.
 //
-//  The base URL is configurable; in dev CRA's "proxy" field also
-//  forwards /api to localhost:8000.
+//  The base URL is configurable; Next.js rewrites in next.config.mjs
+//  proxy /api to localhost:8000 in dev.
 // ============================================================
 
-const API_BASE = process.env.REACT_APP_API_BASE || "";
+const API_BASE = process.env.NEXT_PUBLIC_API_BASE || "";
 
 /**
  * Stream a chat turn.
