@@ -340,3 +340,7 @@ independently of the model.
 - The install "steps" shown in product cards are real customer repair stories
   scraped from PartSelect's product pages (the `.repair-story` section), not
   LLM-generated content.
+- Parts can be looked up by PartSelect number (PS...), manufacturer number, or
+  older cross-reference numbers (e.g. AP6019471 resolves to PS11752778). Cross-
+  reference lookup works from the local cache; PartSelect does not expose a URL
+  for these numbers, so they require the canonical part to be cached first.

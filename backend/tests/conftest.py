@@ -53,6 +53,8 @@ def seeded_offline_repo():
     tools.repo.models = {FIXTURE_MODEL["model_number"].upper(): FIXTURE_MODEL}
     tools.repo._by_ps = {FIXTURE_PART["ps_number"].upper(): FIXTURE_PART}
     tools.repo._by_mfr = {FIXTURE_PART["mfr_number"].upper(): FIXTURE_PART}
+    tools.repo._by_replaces = {rp.strip().upper(): FIXTURE_PART
+                                for rp in FIXTURE_PART.get("replaces_parts", [])}
     from app.search import SearchIndex
     tools.repo.index = SearchIndex(tools.repo.parts)
     yield

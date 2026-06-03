@@ -100,67 +100,31 @@
     "symptoms_data": {
       "10640262010 Kenmore Refrigerator - Symptoms": [
         {
-          "ps_number": "PS11738973",
-          "name": "Evaporator Fan Blade",
-          "mfr_number": "WP2169142",
-          "price": 28.42,
+          "ps_number": "PS17629131",
+          "name": "ICE MAKER KIT-PKG ASSEMBLY (EZ",
+          "mfr_number": "W11700559",
+          "price": 146.56,
           "in_stock": true,
-          "fix_pct": 28,
-          "url": "https://www.partselect.com/PS11738973-Whirlpool-WP2169142-Evaporator-Fan-Blade.htm"
+          "fix_pct": 76,
+          "url": "https://www.partselect.com/PS17629131-Whirlpool-W11700559-ICE-MAKER-KIT-PKG-ASSEMBLY-EZ.htm"
         },
         {
-          "ps_number": "PS1964356",
-          "name": "Fan Blade",
-          "mfr_number": "W10156818",
-          "price": 49.5,
+          "ps_number": "PS11739119",
+          "name": "Refrigerator Crisper Drawer with Humidity Control",
+          "mfr_number": "WP2188656",
+          "price": 88.88,
           "in_stock": true,
-          "fix_pct": 20,
-          "url": "https://www.partselect.com/PS1964356-Whirlpool-W10156818-Fan-Blade.htm"
+          "fix_pct": 17,
+          "url": "https://www.partselect.com/PS11739119-Whirlpool-WP2188656-Refrigerator-Crisper-Drawer-with-Humidity-Control.htm"
         },
         {
-          "ps_number": "PS11739042",
-          "name": "Refrigerator Lower Door Closing Cam",
-          "mfr_number": "WP2182179",
-          "price": 9.62,
-          "in_stock": true,
-          "fix_pct": 16,
-          "url": "https://www.partselect.com/PS11739042-Whirlpool-WP2182179-Refrigerator-Lower-Door-Closing-Cam.htm"
-        },
-        {
-          "ps_number": "PS11739011",
-          "name": "Fan Grommet",
-          "mfr_number": "WP2176759",
-          "price": 9.62,
-          "in_stock": true,
-          "fix_pct": 11,
-          "url": "https://www.partselect.com/PS11739011-Whirlpool-WP2176759-Fan-Grommet.htm"
-        },
-        {
-          "ps_number": "PS11743364",
-          "name": "WP65889-4",
-          "mfr_number": "WP65889-4",
-          "price": 54.24,
-          "in_stock": true,
-          "fix_pct": 10,
-          "url": "https://www.partselect.com/PS11743364-Whirlpool-WP65889-4-Refrigerator-Run-Capacitor.htm"
-        },
-        {
-          "ps_number": "PS11752991",
-          "name": "Refrigerator Door Cam",
-          "mfr_number": "WPW10329686",
-          "price": 9.62,
-          "in_stock": true,
-          "fix_pct": 10,
-          "url": "https://www.partselect.com/PS11752991-Whirlpool-WPW10329686-Refrigerator-Door-Cam.htm"
-        },
-        {
-          "ps_number": "PS11739140",
-          "name": "Condenser Fan Motor",
-          "mfr_number": "WP2188874",
-          "price": 82.68,
-          "in_stock": true,
-          "fix_pct": 5,
-          "url": "https://www.partselect.com/PS11739140-Whirlpool-WP2188874-Condenser-Fan-Motor.htm"
+          "ps_number": "PS11742366",
+          "name": "Adhesive Cement",
+          "mfr_number": "WP4317852",
+          "price": 0.0,
+          "in_stock": false,
+          "fix_pct": 7,
+          "url": "https://www.partselect.com/PS11742366-Whirlpool-WP4317852-Adhesive-Cement.htm"
         }
       ]
     }

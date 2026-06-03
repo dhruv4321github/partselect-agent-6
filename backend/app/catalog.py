@@ -39,6 +39,10 @@ class PartsRepository:
 
         self._by_ps = {p["ps_number"].upper(): p for p in self.parts}
         self._by_mfr = {p["mfr_number"].upper(): p for p in self.parts}
+        self._by_replaces: dict[str, dict] = {}
+        for p in self.parts:
+            for rp in p.get("replaces_parts", []):
+                self._by_replaces[rp.strip().upper()] = p
         self.index = SearchIndex(self.parts)
 
         self.live = PartSelectClient(
@@ -57,6 +61,8 @@ class PartsRepository:
             self._by_ps[key] = part
             if part.get("mfr_number"):
                 self._by_mfr[part["mfr_number"].upper()] = part
+            for rp in part.get("replaces_parts", []):
+                self._by_replaces[rp.strip().upper()] = part
             self.parts.append(part)
             self.index = SearchIndex(self.parts)
             if self.persist:
@@ -104,12 +110,12 @@ class PartsRepository:
         if not part_number:
             return None
         key = part_number.strip().upper().replace(" ", "")
-        local = self._by_ps.get(key) or self._by_mfr.get(key)
+        local = self._by_ps.get(key) or self._by_mfr.get(key) or self._by_replaces.get(key)
         if local:
             if enrich:
                 return self._enrich_part(local)
             return local
-        if self.live.enabled and key.startswith("PS"):
+        if self.live.enabled:
             fetched = self.live.fetch_part(key)
             if fetched:
                 return self._remember_part(fetched)

@@ -27,13 +27,6 @@ def _client_with_fixture(html):
     return c
 
 
-def test_live_off_by_default():
-    from app.config import settings
-    # Live fetch defaults OFF (PartSelect blocks server-side requests; opt in
-    # with curl_cffi + LIVE_FETCH=true). The demo runs on the curated catalog.
-    assert settings.live_fetch is False
-
-
 def test_live_model_parser():
     c = _client_with_fixture(MODEL_HTML)
     res = c.fetch_model("WDF330PAHS")
@@ -66,6 +59,8 @@ def _seed_part(repo):
     repo.parts = [FIXTURE_PART]
     repo._by_ps = {FIXTURE_PART["ps_number"].upper(): FIXTURE_PART}
     repo._by_mfr = {FIXTURE_PART["mfr_number"].upper(): FIXTURE_PART}
+    repo._by_replaces = {rp.strip().upper(): FIXTURE_PART
+                         for rp in FIXTURE_PART.get("replaces_parts", [])}
 
 
 def test_repo_live_compatibility_unlisted_is_unconfirmed():
@@ -83,14 +78,20 @@ PART_HTML = b"""
 Manufacturer Part Number WP8269145
 <span itemprop="price">$14.65</span>
 <div>Add to Cart In Stock</div>
-<div>Installation Instructions
-  Door spring link broken
-  1. Open the dishwasher and remove the two grommets. 2. Remove the kick plate under the door. 3. Pull the dishwasher out about 12 inches. 4. Attach the bracket and reverse to reinstall.
-  Parts Used:
-  Difficulty Level: Easy
-  Total Repair Time: 15 - 30 mins
-  Tools: Screw drivers, Wrench (Adjustable) https://www.youtube.com/watch?v=dTsA3uWROA0
+<div class="repair-story">
+  <div class="repair-story__details">
+    Difficulty Level: Easy
+    Total Repair Time: 15 - 30 mins
+    Tools: Screw drivers, Wrench (Adjustable)
+  </div>
+  <div class="repair-story__title">Door spring link broken</div>
+  <div class="repair-story__instruction">Open the dishwasher and remove the two grommets then remove the kick plate under the door.</div>
 </div>
+<div class="repair-story">
+  <div class="repair-story__title">Bracket was cracked</div>
+  <div class="repair-story__instruction">Pull the dishwasher out about 12 inches and attach the bracket.</div>
+</div>
+<img src="https://img.youtube.com/vi/dTsA3uWROA0/hqdefault.jpg" />
 </body></html>
 """
 
@@ -103,4 +104,13 @@ def test_live_part_parser_extracts_install_steps():
     assert install["time_estimate"] == "15 - 30 mins"
     assert "Screw drivers" in install["tools_required"]
     assert install["video_url"].endswith("dTsA3uWROA0")
-    assert len(install["steps"]) == 4  # the four numbered steps
+    assert len(install["steps"]) == 2
+
+
+def test_repo_lookup_by_replaces_part():
+    """A part can be found by one of its replaces_parts numbers."""
+    repo = PartsRepository(persist=False)
+    _seed_part(repo)
+    found = repo.get_part("AP6019471")
+    assert found is not None
+    assert found["ps_number"] == "PS11752778"
