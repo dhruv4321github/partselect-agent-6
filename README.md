@@ -50,8 +50,8 @@ You need **Python 3.10+**, **Node 18+**, and one LLM API key.
 ```bash
 cd backend
 pip install -r requirements.txt
-pip install curl_cffi                                  # required for live fetch
-cp .env.example .env                                  # then paste your key into .env
+pip install curl_cffi                                 # required for live fetch
+cp .env.example .env                                 # then paste your key into .env
 uvicorn app.main:app --reload --port 8000
 ```
 
