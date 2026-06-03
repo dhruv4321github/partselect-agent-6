@@ -49,7 +49,6 @@ You need **Python 3.10+**, **Node 18+**, and one LLM API key.
 
 ```bash
 cd backend
-python -m venv .venv && source .venv/bin/activate     # Windows: .venv\Scripts\activate
 pip install -r requirements.txt
 pip install curl_cffi                                  # required for live fetch
 cp .env.example .env                                  # then paste your key into .env
