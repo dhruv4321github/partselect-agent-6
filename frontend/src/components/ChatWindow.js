@@ -8,7 +8,7 @@ import ModelPin from "./ModelPin";
 const WELCOME = {
   role: "assistant",
   content:
-    "Hi! I'm the **PartSelect** parts assistant. I can help you find **refrigerator and dishwasher** parts, check if a part fits your model, walk through installation, troubleshoot a symptom, or check an order.\n\nWhat can I help you with?",
+    "Hi! I'm the **PartSelect** parts assistant. I can help you find **refrigerator and dishwasher** parts, check if a part fits your model, walk through installation, troubleshoot a symptom, or manage your cart.\n\nWhat can I help you with?",
   cards: [],
   suggestions: [],
 };
@@ -17,10 +17,10 @@ const WELCOME = {
 // case study plus a couple that exercise transactions / model lookup.
 const STARTER_PROMPTS = [
   "How can I install part number PS11752778?",
-  "Is part PS11752778 compatible with my WDT780SAEM1 model?",
+  "Is part PS11752778 compatible with my 10640262010 model?",
   "The ice maker on my Whirlpool fridge is not working. How can I fix it?",
   "What parts fit my WDT780SAEM1 dishwasher?",
-  "Where is my order PS-1042205?",
+  "Can you tell me what parts are compatible with JDR8895AAS?",
 ];
 
 function ChatWindow() {
@@ -184,7 +184,7 @@ function ChatWindow() {
             value={input}
             onChange={(e) => setInput(e.target.value)}
             onKeyDown={onKeyDown}
-            placeholder="Ask about a part, model compatibility, installation, or an order…"
+            placeholder="Ask about a part, model compatibility, installation, or a symptom…"
             rows="1"
             disabled={busy}
           />

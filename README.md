@@ -140,11 +140,16 @@ part or model. This has significant advantages:
   make a handful of focused requests per conversation turn.
 
 The tradeoff is **first-query latency**: a part/model not yet in the cache
-requires 1–3 live HTTP requests (model page, part page, symptom page), each
-adding ~1.5s of delay due to polite rate-limiting. Repeat queries are instant.
-In production, this cold-start cost could be mitigated with a warm-up script that
-pre-fetches high-traffic models, or by replacing the scraper with a licensed data
-feed behind the same `PartsRepository` interface.
+requires live HTTP requests. Model pages are fast (one deterministic URL), but
+part lookups need URL resolution since PartSelect's canonical part URLs contain
+a slug that isn't derivable from the PS number alone. Resolution works via a
+**sitemap index** -- a one-time download of PartSelect's sitemap XML files that
+maps all ~100K PS numbers to their full URLs, cached locally as
+`ps_url_index.json`. After the first build, lookups are instant dictionary reads.
+Repeat queries for any entity are served from disk. In production, this
+cold-start cost could be mitigated with a warm-up script that pre-fetches
+high-traffic models, or by replacing the scraper with a licensed data feed
+behind the same `PartsRepository` interface.
 
 ### Agentic tool loop, not retrieval-then-answer
 
@@ -239,19 +244,23 @@ The on-demand architecture naturally supports several scaling strategies:
 ## PartSelect's bot protection
 
 PartSelect sits behind Akamai bot protection that returns **HTTP 403** to
-server-side `requests` — it fingerprints the TLS/HTTP handshake, which a real
-browser satisfies and `requests` does not. To work around this:
+plain `requests` and **HTTP 500** for short-form part URLs -- it fingerprints
+the TLS/HTTP handshake, which a real browser satisfies and server-side HTTP
+clients do not. To work around this:
 
 ```bash
 pip install curl_cffi      # impersonates a real browser's TLS fingerprint
 # set LIVE_FETCH=true in .env, then restart
 ```
 
-With `curl_cffi`, the client routes all requests through it (`impersonate=
-"chrome"`), which gets past the 403 in most cases. The code degrades
-gracefully: no `curl_cffi` or a hard block → it logs the reason and the app
+With `curl_cffi`, the client impersonates Chrome's TLS fingerprint
+(`impersonate="chrome"`), which gets past the 403 for page fetches (model
+pages, part pages, symptom pages, sitemaps). Part URL resolution uses the
+**sitemap index** rather than short-URL redirects, since PartSelect returns 500
+for `/PSxxxxx.htm` even with browser impersonation. The code degrades
+gracefully: no `curl_cffi` or a hard block -> it logs the reason and the app
 keeps serving whatever is already cached. The honest production answer isn't
-"scrape harder" — it's a **licensed data feed** behind the same
+"scrape harder" -- it's a **licensed data feed** behind the same
 `PartsRepository` interface; the live scraper demonstrates the
 ingestion/parsing approach and keeps the demo fully functional.
 
@@ -315,7 +324,6 @@ For a clean slate, reset both files to `[]` and restart the server.
 | JSON file storage vs. database | Zero-dependency, easy to inspect/reset | No concurrent writes, doesn't scale past a single instance |
 | `gpt-4o-mini` vs. larger models | Fast, cheap, good enough for tool-calling | Occasionally needs explicit anti-hallucination instructions |
 | Keyword search vs. vector/semantic | No embedding model dependency, instant | Misses synonyms and fuzzy matches |
-| CRA dev proxy + SSE | Simple setup, custom `setupProxy.js` fixes buffering | CRA is deprecated upstream; Next.js migration is straightforward |
 | Scraper parsing HTML selectors | Works with the current PartSelect markup | Fragile to site redesigns (degrades gracefully, never crashes) |
 | Appliance scope (fridge + dishwasher) | Tight, testable, demonstrable | Would need prompt + data changes to widen |
 

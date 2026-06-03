@@ -12,8 +12,12 @@ Two retrieval paths, by reliability:
     and it works for ANY model, not just the seeded ones.
   • PART pages — `/PS…htm` slugs aren't derivable from a bare PS number, so a
     bare-PS lookup needs URL resolution. We resolve via (a) a URL we already
-    learned (e.g. from a model page or the seed), or (b) optionally the sitemap
-    index (opt-in; one-time multi-MB download, cached).
+    learned (e.g. from a model page), or (b) the sitemap index — a one-time
+    download of PartSelect's sitemap XML files that maps all ~100K PS numbers to
+    their canonical URLs (cached to disk as ps_url_index.json). The sitemap path
+    is the primary resolution mechanism; PartSelect returns HTTP 500 for short
+    `/PSxxxxx.htm` URLs, so the short-URL redirect path is a non-functional
+    fallback kept for robustness.
 
 Politeness: identifies via User-Agent, rate-limits, caches pages to disk, and
 checks robots.txt at runtime. The model OVERVIEW page is robots-allowed for all
@@ -191,12 +195,12 @@ class PartSelectClient:
 
     # ---- PS -> URL resolution -----------------------------------------
     def _resolve_ps_url(self, ps: str) -> Optional[str]:
-        # 1) Fast path: PartSelect 301-redirects the short form /PSxxxxx.htm to
-        #    the full canonical slug. One cheap request, no sitemap needed.
+        # 1) Try short URL redirect (currently returns 500 on PartSelect, but
+        #    kept as a first attempt in case they restore it).
         short = self._resolve_short(ps)
         if short:
             return short
-        # 2) Fallback: the sitemap index (one-time, cached). Opt-in via config.
+        # 2) Primary path: the sitemap index (~100K PS# -> URL mappings, cached).
         if not self.resolve_via_sitemap:
             return None
         if self._ps_url_index is None:
@@ -229,8 +233,8 @@ class PartSelectClient:
         return None
 
     def _build_ps_url_index(self) -> dict:
-        """Fallback: download the part-detail sitemaps and map PS# -> URL.
-        Cached to disk; multi-MB, hence used only if the short path fails."""
+        """Download the part-detail sitemaps and map PS# -> URL (~100K entries).
+        Cached to disk as ps_url_index.json; one-time multi-MB download."""
         idx_path = os.path.join(self.cache_dir, "ps_url_index.json")
         if os.path.exists(idx_path):
             with open(idx_path) as f:
