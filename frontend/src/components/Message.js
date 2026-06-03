@@ -2,9 +2,6 @@ import React from "react";
 import { marked } from "marked";
 import ProductCard from "./cards/ProductCard";
 import CompatibilityCard from "./cards/CompatibilityCard";
-import InstallGuide from "./cards/InstallGuide";
-import RepairHelp from "./cards/RepairHelp";
-import OrderCard from "./cards/OrderCard";
 import CartCard from "./cards/CartCard";
 import SuggestedPrompts from "./SuggestedPrompts";
 
@@ -23,13 +20,7 @@ function renderCard(card, i, ctx) {
       return <ProductCard key={i} card={card} {...ctx} />;
     case "compatibility":
       return <CompatibilityCard key={i} card={card} {...ctx} />;
-    case "install":
-      return <InstallGuide key={i} card={card} />;
-    case "repair":
-      return <RepairHelp key={i} card={card} {...ctx} />;
-    case "order":
-      return <OrderCard key={i} card={card} />;
-    case "cart":
+case "cart":
       return <CartCard key={i} card={card} />;
     default:
       return null;

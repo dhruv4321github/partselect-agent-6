@@ -32,6 +32,7 @@ import json
 import os
 import re
 import time
+import urllib.parse
 import urllib.robotparser
 from typing import Optional
 
@@ -643,6 +644,7 @@ class PartSelectClient:
             if not title or title in seen:
                 continue
             seen.add(title)
+            href = urllib.parse.quote(href, safe="/:?&#=@")
             if href.startswith("/"):
                 href = BASE + href
             results.append({"title": title, "url": href})
@@ -726,6 +728,7 @@ class PartSelectClient:
                 continue
             p = link.find("p")
             desc = _clean(p.get_text()) if p else ""
+            href = urllib.parse.quote(href, safe="/:?&#=@")
             results.append({"title": title, "description": desc, "url": href})
         return results
 

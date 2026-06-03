@@ -22,7 +22,7 @@
     "symptoms": [
       {
         "title": "Door won\u2019t open or close",
-        "url": "https://www.partselect.com/Models/10640262010/Symptoms/Door-won\u2019t-open-or-close/"
+        "url": "https://www.partselect.com/Models/10640262010/Symptoms/Door-won%E2%80%99t-open-or-close/"
       },
       {
         "title": "Light not working",
@@ -86,7 +86,7 @@
       },
       {
         "title": "Ice maker won\u2019t dispense ice",
-        "url": "https://www.partselect.com/Models/10640262010/Symptoms/Ice-maker-won\u2019t-dispense-ice/"
+        "url": "https://www.partselect.com/Models/10640262010/Symptoms/Ice-maker-won%E2%80%99t-dispense-ice/"
       },
       {
         "title": "Fridge runs too long",
@@ -100,31 +100,13 @@
     "symptoms_data": {
       "10640262010 Kenmore Refrigerator - Symptoms": [
         {
-          "ps_number": "PS11739042",
-          "name": "Refrigerator Lower Door Closing Cam",
-          "mfr_number": "WP2182179",
-          "price": 9.62,
+          "ps_number": "PS17629131",
+          "name": "ICE MAKER KIT-PKG ASSEMBLY (EZ",
+          "mfr_number": "W11700559",
+          "price": 146.56,
           "in_stock": true,
-          "fix_pct": 52,
-          "url": "https://www.partselect.com/PS11739042-Whirlpool-WP2182179-Refrigerator-Lower-Door-Closing-Cam.htm"
-        },
-        {
-          "ps_number": "PS11752991",
-          "name": "Refrigerator Door Cam",
-          "mfr_number": "WPW10329686",
-          "price": 9.62,
-          "in_stock": true,
-          "fix_pct": 34,
-          "url": "https://www.partselect.com/PS11752991-Whirlpool-WPW10329686-Refrigerator-Door-Cam.htm"
-        },
-        {
-          "ps_number": "PS11743364",
-          "name": "WP65889-4",
-          "mfr_number": "WP65889-4",
-          "price": 54.24,
-          "in_stock": true,
-          "fix_pct": 8,
-          "url": "https://www.partselect.com/PS11743364-Whirlpool-WP65889-4-Refrigerator-Run-Capacitor.htm"
+          "fix_pct": 76,
+          "url": "https://www.partselect.com/PS17629131-Whirlpool-W11700559-ICE-MAKER-KIT-PKG-ASSEMBLY-EZ.htm"
         },
         {
           "ps_number": "PS11739119",
@@ -132,28 +114,40 @@
           "mfr_number": "WP2188656",
           "price": 88.88,
           "in_stock": true,
-          "fix_pct": 2,
+          "fix_pct": 17,
           "url": "https://www.partselect.com/PS11739119-Whirlpool-WP2188656-Refrigerator-Crisper-Drawer-with-Humidity-Control.htm"
         },
         {
-          "ps_number": "PS11741512",
-          "name": "Refrigerator Installation Screw",
-          "mfr_number": "WP3400012",
-          "price": 7.47,
-          "in_stock": true,
-          "fix_pct": 2,
-          "url": "https://www.partselect.com/PS11741512-Whirlpool-WP3400012-Refrigerator-Installation-Screw.htm"
-        },
-        {
-          "ps_number": "PS11739043",
-          "name": "Refrigerator Thimble Top",
-          "mfr_number": "WP2182181",
-          "price": 9.62,
-          "in_stock": true,
-          "fix_pct": 2,
-          "url": "https://www.partselect.com/PS11739043-Whirlpool-WP2182181-Refrigerator-Thimble-Top.htm"
+          "ps_number": "PS11742366",
+          "name": "Adhesive Cement",
+          "mfr_number": "WP4317852",
+          "price": 0.0,
+          "in_stock": false,
+          "fix_pct": 7,
+          "url": "https://www.partselect.com/PS11742366-Whirlpool-WP4317852-Adhesive-Cement.htm"
         }
       ]
     }
+  },
+  {
+    "model_number": "WDT780SAEM1",
+    "brand": "Whirlpool",
+    "appliance_type": "Dishwasher",
+    "compatible_parts": [
+      "PS3406971",
+      "PS10065979",
+      "PS11746591",
+      "PS972325",
+      "PS11745496",
+      "PS11750093",
+      "PS12348515",
+      "PS11753379",
+      "PS11750092",
+      "PS11755592",
+      "PS11755736",
+      "PS11759673"
+    ],
+    "verified": true,
+    "source": "live"
   }
 ]

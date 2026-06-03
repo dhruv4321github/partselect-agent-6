@@ -60,23 +60,21 @@ def test_repo_live_compatibility_listed_part():
     assert comp["compatible"] is True
 
 
+def _seed_part(repo):
+    """Seed a known part into the repo for offline compatibility tests."""
+    from tests.conftest import FIXTURE_PART
+    repo.parts = [FIXTURE_PART]
+    repo._by_ps = {FIXTURE_PART["ps_number"].upper(): FIXTURE_PART}
+    repo._by_mfr = {FIXTURE_PART["mfr_number"].upper(): FIXTURE_PART}
+
+
 def test_repo_live_compatibility_unlisted_is_unconfirmed():
     """A part missing from a (partial) live list must NOT be asserted as a hard no."""
     repo = PartsRepository(persist=False)
-    repo.load_sample()  # so PS11752778 resolves locally
+    _seed_part(repo)
     repo.live = _client_with_fixture(MODEL_HTML)
     comp = repo.check_compatibility("PS11752778", "WDF330PAHS")
     assert comp["compatible"] is None  # unconfirmed, not False
-
-
-def test_seeded_path_unaffected_by_live():
-    repo = PartsRepository(persist=False)
-    repo.load_sample()
-    repo.live = _client_with_fixture(MODEL_HTML)
-    # Seeded incompatibility still authoritative + still offers an alternative.
-    comp = repo.check_compatibility("PS11752778", "WDT780SAEM1")
-    assert comp["compatible"] is False
-    assert comp.get("alternative")
 
 
 PART_HTML = b"""

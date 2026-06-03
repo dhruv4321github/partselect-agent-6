@@ -1,8 +1,8 @@
 """PartsRepository: the single data-access layer for the agent's tools.
 
-Everything the tools need (lookup, search, compatibility, repair help, orders)
-goes through this class. Today it reads curated JSON; swapping to Postgres +
-pgvector or a live PartSelect scraper means reimplementing this one class.
+Everything the tools need (lookup, search, compatibility, repair help)
+goes through this class. It reads cached JSON that grows over time as
+parts/models are fetched live from PartSelect.
 
 It also produces the structured "cards" the frontend renders. The agent's tools
 return a short text summary for the model PLUS these cards for the UI, so the
@@ -33,39 +33,21 @@ def _save(name: str, data) -> None:
 
 class PartsRepository:
     def __init__(self, persist: bool = True):
-        # Catalog ships EMPTY by default (live-first). It doubles as a growing
-        # on-disk cache: parts/models fetched live are written back here, so the
-        # data folder fills up as you ask queries. Restore the curated sample any
-        # time with: cp parts.sample.json parts.json && cp models.sample.json models.json
         self.persist = persist
         self.parts: List[dict] = _load("parts.json")
         self.models = {m["model_number"].upper(): m for m in _load("models.json")}
-        self.repair_help: List[dict] = _load("repair_help.json")
-        self.orders = _load("orders.json")
 
         self._by_ps = {p["ps_number"].upper(): p for p in self.parts}
-        # Allow lookups by manufacturer part number too.
         self._by_mfr = {p["mfr_number"].upper(): p for p in self.parts}
         self.index = SearchIndex(self.parts)
 
-        # Hybrid mode: fall back to live partselect.com data for parts/models not
-        # in the cache, remember them in memory, and persist them to disk.
         self.live = PartSelectClient(
             enabled=settings.live_fetch,
             delay=settings.live_delay,
             cache_dir=settings.live_cache_dir,
             resolve_via_sitemap=settings.live_resolve_via_sitemap,
         )
-        self._live_models: dict = {}  # model_number -> {"model":..., "parts":[...]}
-
-    def load_sample(self) -> None:
-        """Load the curated sample catalog into this repo (used by tests, and a
-        convenient way to pre-warm without the live site)."""
-        self.parts = _load("parts.sample.json")
-        self.models = {m["model_number"].upper(): m for m in _load("models.sample.json")}
-        self._by_ps = {p["ps_number"].upper(): p for p in self.parts}
-        self._by_mfr = {p["mfr_number"].upper(): p for p in self.parts}
-        self.index = SearchIndex(self.parts)
+        self._live_models: dict = {}
 
     def _remember_part(self, part: dict) -> dict:
         """Index a live-fetched part so subsequent lookups/search hit the cache,
@@ -76,7 +58,7 @@ class PartsRepository:
             if part.get("mfr_number"):
                 self._by_mfr[part["mfr_number"].upper()] = part
             self.parts.append(part)
-            self.index = SearchIndex(self.parts)  # keep keyword search current
+            self.index = SearchIndex(self.parts)
             if self.persist:
                 try:
                     _save("parts.json", self.parts)
@@ -127,7 +109,6 @@ class PartsRepository:
             if enrich:
                 return self._enrich_part(local)
             return local
-        # Live fallback (only fires when LIVE_FETCH is on and key looks like a PS#).
         if self.live.enabled and key.startswith("PS"):
             fetched = self.live.fetch_part(key)
             if fetched:
@@ -152,7 +133,6 @@ class PartsRepository:
             return self._live_models[model_key]
         result = self.live.fetch_model(model_key)
         if result:
-            # Remember each listed part so product lookups/search can reuse them.
             for p in result["parts"]:
                 self._remember_part(p)
             self._remember_model(result["model"])
@@ -167,16 +147,13 @@ class PartsRepository:
         model_key = (model_number or "").strip().upper().replace(" ", "")
         model = self.models.get(model_key)
 
-        # If the model isn't cached, consult the live site FIRST: the model page
-        # both confirms compatibility and caches the part, so we usually avoid a
-        # separate part-URL lookup entirely.
         live_model = None
         if model is None and self.live.enabled:
             live = self._get_live_model(model_key)
             if live:
                 live_model = live["model"]
 
-        part = self.get_part(part_number)  # may now be in the live cache
+        part = self.get_part(part_number)
         if not part:
             return {"status": "part_not_found", "part_number": part_number}
 
@@ -208,8 +185,6 @@ class PartsRepository:
                 f"compatible with model {model_number}."
             )
         elif live_model is not None:
-            # Live model found, but this part wasn't in its listed parts. Don't
-            # assert a hard "no" from a partial list — report honestly as unconfirmed.
             result["compatible"] = None
             result["reason"] = (
                 f"{part['name']} doesn't appear in the parts listed for "
@@ -227,7 +202,6 @@ class PartsRepository:
                 f"{part['name']} is not listed as compatible with {model_number} "
                 f"({model['brand']} {model['appliance_type']})."
             )
-            # Offer a same-category part that DOES fit the model.
             alt = self._alternative_for_model(model, part.get("category"))
             if alt:
                 result["alternative"] = alt
@@ -238,7 +212,6 @@ class PartsRepository:
             cand = self._by_ps.get(ps.upper())
             if cand and (category is None or cand.get("category") == category):
                 return cand
-        # No same-category match -> return the first compatible part as a hint.
         for ps in model.get("compatible_parts", []):
             cand = self._by_ps.get(ps.upper())
             if cand:
@@ -249,8 +222,6 @@ class PartsRepository:
         model = self.get_model(model_number)
         if not model:
             return {"status": "model_not_found", "model_number": model_number}
-        # Local models reference seeded parts by PS#; live models already carry
-        # their parts in the live cache. Resolve PS#s through get_part either way.
         parts = []
         for ps in model.get("compatible_parts", []):
             p = self._by_ps.get(ps.upper())
@@ -262,31 +233,16 @@ class PartsRepository:
 
     # ---- repair help ---------------------------------------------------
     def find_repair_help(self, appliance_type: str, symptom: str, brand: str = None) -> dict:
-        """Search for parts that fix a symptom. Returns:
-        {"source": "symptom_list"|"static"|"none", ...}
-
-        Priority chain:
-          1. Live PartSelect /Repair/ symptom pages (scraped causes + advice)
-          2. Static repair_help.json guides (curated fallback)"""
-
-        # 1) Live PartSelect /Repair/ pages: return symptom list for the LLM
-        #    to pick from (it calls get_symptom_repair_guide next).
+        """Search for parts that fix a symptom via live PartSelect /Repair/ pages."""
         if self.live.enabled and appliance_type:
             symptoms_list = self.live.fetch_repair_symptoms(appliance_type)
             if symptoms_list:
                 return {"source": "symptom_list", "parts": [], "guide": None,
                         "symptoms": symptoms_list, "appliance_type": appliance_type}
-
-        # 3) Fallback: static repair_help.json guides.
-        guide = self._match_static_guide(appliance_type, symptom)
-        if guide:
-            return {"source": "static", "parts": [], "guide": guide}
-
         return {"source": "none", "parts": [], "guide": None}
 
     def fetch_symptom_repair_guide(self, symptom_url: str) -> Optional[dict]:
-        """Fetch a specific symptom detail page from PartSelect. Called by the
-        get_symptom_repair_guide tool after the LLM picks the best symptom."""
+        """Fetch a specific symptom detail page from PartSelect."""
         return self.live.fetch_symptom_detail(symptom_url)
 
     def fetch_model_symptoms(self, model_number: str) -> list[dict]:
@@ -309,9 +265,7 @@ class PartsRepository:
         return symptoms
 
     def fetch_model_symptom_parts(self, model_number: str, symptom_url: str) -> Optional[list]:
-        """Fetch parts that fix a specific symptom on a specific model.
-        Returns a list of {ps_number, name, fix_pct, ...} dicts.
-        Caches under model.symptoms_data[symptom_title] in models.json."""
+        """Fetch parts that fix a specific symptom on a specific model."""
         key = (model_number or "").strip().upper().replace(" ", "")
         model = self.models.get(key)
 
@@ -344,30 +298,6 @@ class PartsRepository:
                 _save("models.json", list(self.models.values()))
             except Exception:
                 pass
-
-    def _match_static_guide(self, appliance_type: str, symptom: str) -> Optional[dict]:
-        """Match a symptom against the curated repair_help.json entries."""
-        symptom_l = (symptom or "").lower()
-        best, best_score = None, 0
-        for entry in self.repair_help:
-            if appliance_type and entry["appliance_type"].lower() != appliance_type.lower():
-                continue
-            haystack = [entry["symptom"].lower()] + [a.lower() for a in entry.get("aliases", [])]
-            score = sum(1 for h in haystack if h in symptom_l or symptom_l in h)
-            sym_tokens = set(symptom_l.split())
-            score += sum(0.3 for h in haystack for w in h.split() if w in sym_tokens)
-            if score > best_score:
-                best, best_score = entry, score
-        return best if best else None
-
-    # ---- orders --------------------------------------------------------
-    def lookup_order(self, order_id: str, email: str = None) -> Optional[dict]:
-        order = self.orders.get((order_id or "").strip().upper())
-        if not order:
-            return None
-        if email and order.get("email", "").lower() != email.strip().lower():
-            return {"status": "email_mismatch"}
-        return order
 
     # ---- card builders (UI payloads) -----------------------------------
     @staticmethod

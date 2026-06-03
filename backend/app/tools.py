@@ -161,19 +161,7 @@ TOOL_SCHEMAS = [
             "required": ["model_number"],
         },
     },
-    {
-        "name": "lookup_order",
-        "description": "Look up the status of a customer order by order ID (e.g. PS-1042205).",
-        "input_schema": {
-            "type": "object",
-            "properties": {
-                "order_id": {"type": "string"},
-                "email": {"type": "string"},
-            },
-            "required": ["order_id"],
-        },
-    },
-    {
+{
         "name": "add_to_cart",
         "description": "Add a part to the customer's cart. Returns the updated cart state.",
         "input_schema": {
@@ -362,9 +350,10 @@ def tool_get_repair_help(appliance_type, symptom, brand=None):
 
     if result["source"] == "none":
         return {
-            "summary": f"No troubleshooting info found for '{symptom}' on a {appliance_type}. "
-                       f"Ask the customer for their model number so we can look up "
-                       f"compatible parts, or try searching by part name.",
+            "summary": f"No generic troubleshooting info found for '{symptom}' on a "
+                       f"{appliance_type}. Ask the customer for their model number, "
+                       f"then call diagnose_model_symptom with the model number and "
+                       f"symptom '{symptom}' to get model-specific parts that fix this.",
             "cards": [],
         }
 
@@ -410,32 +399,16 @@ def tool_get_repair_help(appliance_type, symptom, brand=None):
             lines.append(f"\n- {s['title']}: {s['description'][:150]}")
             lines.append(f"  URL: {s['url']}")
         lines.append(
-            "\nPick the symptom that best matches the customer's problem and "
-            "call get_symptom_repair_guide with its URL to get the detailed "
-            "repair guide with causes and fixes."
+            "\nIMPORTANT: Only pick a symptom if it genuinely matches the "
+            "customer's problem. If NONE of the symptoms above are a good "
+            "match, do NOT guess or hallucinate causes. Instead, ask the "
+            "customer for their model number so you can call "
+            "diagnose_model_symptom with their model number and the symptom "
+            f"'{symptom}' to find model-specific parts and causes."
+            "\n\nIf a symptom does match, call get_symptom_repair_guide with "
+            "its URL to get the detailed repair guide with causes and fixes."
         )
         return {"summary": "\n".join(lines), "cards": [], "suggestions": []}
-
-    # Static guide fallback (repair_help.json).
-    guide = result["guide"]
-    lines = [
-        f"Troubleshooting '{guide['symptom']}' on a {appliance_type}.",
-        f"Overview: {guide['overview']}",
-    ]
-    if guide.get("quick_checks"):
-        lines.append("\nQuick checks before replacing parts:")
-        for check in guide["quick_checks"]:
-            lines.append(f"  - {check}")
-    lines.append("\nLikely causes (most common first):")
-    for cause in guide["causes"]:
-        lines.append(f"\n- {cause['title']}: {cause['detail']}")
-        for ps in cause.get("recommended_parts", []):
-            lines.append(f"  Recommended part: {ps}")
-    lines.append(
-        "\nExplain the causes to the customer clearly and suggest "
-        "which parts they may need to check or replace."
-    )
-    return {"summary": "\n".join(lines), "cards": [], "suggestions": []}
 
 
 def tool_find_parts_for_model(model_number, category=None):
@@ -448,9 +421,14 @@ def tool_find_parts_for_model(model_number, category=None):
         }
     parts = res["parts"]
     model = res["model"]
-    summary = (f"{model['brand']} {model['appliance_type']} {model['model_number']}: "
-               f"{len(parts)} catalog part(s) available"
-               + (f" in category '{category}'" if category else "") + ".")
+    lines = [f"{model['brand']} {model['appliance_type']} {model['model_number']}: "
+             f"{len(parts)} catalog part(s) available"
+             + (f" in category '{category}'" if category else "") + "."]
+    for p in parts:
+        price_str = f"${p['price']:.2f}" if p.get("price") else "price TBD"
+        lines.append(f"- {p['name']} (#{p['ps_number']}), {price_str}, "
+                     f"{'in stock' if p.get('in_stock', True) else 'out of stock'}")
+    summary = "\n".join(lines)
     return {
         "summary": summary,
         "cards": [repo.to_product_card(p) for p in parts],
@@ -458,25 +436,6 @@ def tool_find_parts_for_model(model_number, category=None):
         if parts else [],
     }
 
-
-def tool_lookup_order(order_id, email=None):
-    order = repo.lookup_order(order_id, email=email)
-    if order is None:
-        return {
-            "summary": f"No order found with ID {order_id}. Ask the customer to confirm "
-                       f"the order ID (format PS-1234567).",
-            "cards": [],
-        }
-    if order.get("status") == "email_mismatch":
-        return {"summary": "The email provided doesn't match that order. Ask the customer "
-                           "to confirm the email used at checkout.", "cards": []}
-    card = {"type": "order", **{k: order.get(k) for k in [
-        "order_id", "status", "placed_on", "estimated_delivery", "carrier",
-        "tracking_number", "tracking_url", "items", "subtotal", "shipping", "total"]}}
-    summary = (f"Order {order['order_id']} is '{order['status']}', placed "
-               f"{order['placed_on']}, total ${order['total']:.2f}. "
-               f"Estimated delivery {order['estimated_delivery']}.")
-    return {"summary": summary, "cards": [card], "suggestions": []}
 
 
 def _cart_card() -> dict:
@@ -605,9 +564,11 @@ def tool_diagnose_model_symptom(model_number, symptom):
             "summary": f"No parts data found for '{best['title']}' on model {model_number}.",
             "cards": [],
         }
+    top_parts = parts_data[:10]
     lines = [f"Model-specific diagnosis for {model_number}: {best['title']}",
-             f"\nParts that fix this (ranked by likelihood):"]
-    for p in parts_data:
+             f"Source: {best['url']}",
+             f"\nTop {len(top_parts)} parts that fix this (ranked by likelihood):"]
+    for p in top_parts:
         stock = "in stock" if p["in_stock"] else "out of stock"
         price_str = f"${p['price']:.2f}" if p["price"] else "price TBD"
         lines.append(
@@ -616,17 +577,17 @@ def tool_diagnose_model_symptom(model_number, symptom):
         )
     lines.append(
         "\nPresent these parts to the customer ranked by fix likelihood. "
+        "Include the source URL so the customer can see the full details. "
         "ONLY mention the parts and percentages listed above."
     )
-    # Return product cards so the user gets add-to-cart / view-on-website buttons
     cards = []
-    for p in parts_data:
+    for p in top_parts:
         part_obj = repo.get_part(p["ps_number"])
         if part_obj:
             cards.append(repo.to_product_card(part_obj))
     suggestions = []
-    if parts_data:
-        top = parts_data[0]
+    if top_parts:
+        top = top_parts[0]
         suggestions = [f"Tell me about {top['ps_number']}",
                        f"Add {top['ps_number']} to cart"]
     return {"summary": "\n".join(lines), "cards": cards, "suggestions": suggestions}
@@ -639,8 +600,7 @@ TOOL_IMPLEMENTATIONS: Dict[str, Callable] = {
     "get_installation_guide": tool_get_installation_guide,
     "get_repair_help": tool_get_repair_help,
     "find_parts_for_model": tool_find_parts_for_model,
-    "lookup_order": tool_lookup_order,
-    "add_to_cart": tool_add_to_cart,
+"add_to_cart": tool_add_to_cart,
     "view_cart": tool_view_cart,
     "remove_from_cart": tool_remove_from_cart,
     "get_symptom_repair_guide": tool_get_symptom_repair_guide,
